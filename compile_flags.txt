@@ -1,0 +1,11 @@
+-std=c++20
+-Wall
+-Wextra
+-fno-exceptions
+-nostdinc++
+-Iinclude
+-ftemplate-backtrace-limit=0
+-I../core/include
+-fmodules
+-Xclang -fimplicit-module-maps
+-Xclang -fprebuilt-module-path=./build
