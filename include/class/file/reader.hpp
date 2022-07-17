@@ -14,7 +14,8 @@
 namespace class_file {
 
 	enum class reader_stage {
-		magic, version, constant_pool, access_flags, this_class, super_class,
+		magic, version, constant_pool, access_flags,
+		this_class, super_class,
 		interfaces, fields, methods, attributes
 	};
 
