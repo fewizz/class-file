@@ -2,7 +2,7 @@
 
 #include <core/span.hpp>
 
-namespace class_file::code::instruction {
+namespace class_file::attribute::code::instruction {
 
 	struct nop { static constexpr uint8 code = 0; };
 

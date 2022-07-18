@@ -31,7 +31,7 @@ namespace class_file::descriptor {
 				}
 				bool result = handler(
 					descriptor::object_type {
-						(uint8*) iterator, uint16(e - iterator)
+						(char*) iterator, uint16(e - iterator)
 					}
 				);
 				iterator = ++e;
@@ -54,7 +54,7 @@ namespace class_file::descriptor {
 					bool result = handler(
 						descriptor::array_type {
 							rank,
-							(uint8*) iterator, uint16(e - iterator)
+							(char*) iterator, uint16(e - iterator)
 						}
 					);
 					iterator = e;

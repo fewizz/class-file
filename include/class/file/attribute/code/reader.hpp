@@ -1,7 +1,8 @@
 #pragma once
 
+#include "instruction.hpp"
+#include "exception_handler.hpp"
 #include "../type.hpp"
-#include "../../code/instruction.hpp"
 
 #include <core/meta/elements/of.hpp>
 #include <core/loop_action.hpp>
@@ -39,28 +40,48 @@ namespace class_file::attribute::code {
 			return { { cpy }, { max_locals } };
 		}
 
+		reader<Iterator, reader_stage::exception_table>
+		skip () const
+		requires (Stage == reader_stage::code) {
+			Iterator cpy = iterator_;
+			uint32 length = read<uint32, endianness::big>(cpy);
+			auto end = iterator_ + length;
+			return { end };
+		}
+
+		elements::of<
+			reader<Iterator, reader_stage::exception_table>,
+			span<uint8, uint32>
+		>
+		as_span () const
+		requires (Stage == reader_stage::code) {
+			Iterator cpy = iterator_;
+			uint32 length = read<uint32, endianness::big>(cpy);
+			auto end = cpy + length;
+			return {
+				{ end },
+				{ (uint8*) cpy, length }
+			};
+		}
+
 		template<typename Handler>
 		reader<Iterator, reader_stage::exception_table>
 		operator () (Handler&& handler) const
 		requires (Stage == reader_stage::code) {
-			Iterator cpy = iterator_;
+			auto cpy = iterator_;
 			uint32 length = read<uint32, endianness::big>(cpy);
 			return (*this)(forward<Handler>(handler), length);
 		}
 
 		template<typename Handler>
 		reader<Iterator, reader_stage::exception_table>
-		operator () (
-			Handler&& handler,
-			uint32 length
-		) const
+		operator () (Handler&& handler, uint32 length) const
 		requires (Stage == reader_stage::code) {
-			auto end = iterator_ + length;
-			using namespace class_file::code::instruction;
+			using namespace instruction;
 
 			auto cpy = iterator_;
-			read<uint32, endianness::big>(cpy);
-			auto src0 = cpy;
+			auto end = iterator_ + length;
+			auto src0 = iterator_;
 
 			while(cpy - src0 < length) {
 				uint8 instruction_code = read<uint8>(cpy);
@@ -511,9 +532,50 @@ namespace class_file::attribute::code {
 					default: action = handler(instruction_code, cpy);
 				}
 
-				if(action == loop_action::stop) {
-					break;
+				switch (action) {
+					case loop_action::next: break;
+					case loop_action::stop: return { end };
 				}
+			}
+
+			return { end };
+		}
+
+		uint16 count() const
+		requires (Stage == reader_stage::exception_table) {
+			Iterator cpy = iterator_;
+			uint16 length = read<uint16, endianness::big>(cpy);
+			return length;
+		}
+
+		template<typename Handler>
+		reader<Iterator, reader_stage::attributes>
+		operator () (Handler&& handler) const
+		requires (Stage == reader_stage::exception_table) {
+			Iterator cpy = iterator_;
+
+			uint16 length = read<uint16, endianness::big>(cpy);
+
+			Iterator end = cpy + sizeof(uint16) * length * 4;
+
+			while(length > 0) {
+				uint16 start_pc = read<uint16, endianness::big>(cpy);
+				uint16 end_pc = read<uint16, endianness::big>(cpy);
+				uint16 handler_pc = read<uint16, endianness::big>(cpy);
+				uint16 catch_type = read<uint16, endianness::big>(cpy);
+
+				loop_action action = handler(exception_handler {
+					start_pc, end_pc,
+					handler_pc,
+					catch_type
+				});
+
+				switch (action) {
+					case loop_action::next: break;
+					case loop_action::stop: return { end };
+				}
+
+				--length;
 			}
 
 			return { end };
