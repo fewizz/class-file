@@ -1,7 +1,8 @@
 namespace class_file::attribute {
 
 	enum class type {
-		code
+		code,
+		bootstrap_methods
 	};
 
 }
