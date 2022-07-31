@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../constant.hpp"
+
 #include <core/span.hpp>
 
 namespace class_file::attribute::code::instruction {
@@ -33,15 +35,15 @@ namespace class_file::attribute::code::instruction {
 
 	struct ldc {
 		static constexpr uint8 code = 18;
-		uint8 index;
+		constant::index index;
 	};
 	struct ldc_w {
 		static constexpr uint8 code = 19;
-		uint16 index;
+		constant::index index;
 	};
 	struct ldc_2_w {
 		static constexpr uint8 code = 20;
-		uint16 index;
+		constant::index index;
 	};
 
 	struct i_load {
@@ -308,35 +310,35 @@ namespace class_file::attribute::code::instruction {
 
 	struct get_static {
 		static constexpr uint8 code = 178;
-		uint16 index;
+		constant::field_ref_index index;
 	};
 	struct put_static {
 		static constexpr uint8 code = 179;
-		uint16 index;
+		constant::field_ref_index index;
 	};
 	struct get_field {
 		static constexpr uint8 code = 180;
-		uint16 index;
+		constant::field_ref_index index;
 	};
 	struct put_field {
 		static constexpr uint8 code = 181;
-		uint16 index;
+		constant::field_ref_index index;
 	};
 	struct invoke_virtual {
 		static constexpr uint8 code = 182;
-		uint16 index;
+		constant::method_ref_index index;
 	};
 	struct invoke_special {
 		static constexpr uint8 code = 183;
-		uint16 index;
+		constant::method_ref_index index;
 	};
 	struct invoke_static {
 		static constexpr uint8 code = 184;
-		uint16 index;
+		constant::method_ref_index index;
 	};
 	struct invoke_interface {
 		static constexpr uint8 code = 185;
-		uint16 index; uint8 count;
+		constant::interface_method_ref_index index; uint8 count;
 	};
 	struct invoke_dynamic {
 		static constexpr uint8 code = 186;
@@ -345,15 +347,19 @@ namespace class_file::attribute::code::instruction {
 
 	struct _new {
 		static constexpr uint8 code = 187;
-		uint16 index;
+		constant::class_index index;
+	};
+	enum class new_array_type : uint8 {
+		_bool = 4, _char  = 5, _float = 6, _double = 7,
+		_byte = 8, _short = 9, _int   = 10, _long  = 11
 	};
 	struct new_array {
 		static constexpr uint8 code = 188;
-		uint8 type;
+		new_array_type type;
 	};
 	struct a_new_array {
 		static constexpr uint8 code = 189;
-		uint16 index;
+		constant::class_index index;
 	};
 	struct array_length { static constexpr uint8 code = 190; };
 
@@ -361,11 +367,11 @@ namespace class_file::attribute::code::instruction {
 
 	struct check_cast {
 		static constexpr uint8 code = 192;
-		uint16 index;
+		constant::class_index index;
 	};
 	struct instance_of {
 		static constexpr uint8 code = 193;
-		uint16 index;
+		constant::class_index index;
 	};
 	struct monitor_enter { static constexpr uint8 code = 194; };
 	struct monitor_exit { static constexpr uint8 code = 195; };

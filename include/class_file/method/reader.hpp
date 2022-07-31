@@ -38,22 +38,28 @@ namespace class_file::method {
 		}
 
 		elements::of<
-			name_index, reader<Iterator, reader_stage::descriptor_index>
+			constant::name_index,
+			reader<Iterator, reader_stage::descriptor_index>
 		>
 		read_and_get_descriptor_index_reader() const
 		requires (Stage == reader_stage::name_index) {
 			Iterator i = iterator_;
-			name_index name_index{ ::read<uint16, endianness::big>(i) };
+			constant::name_index name_index {
+				::read<uint16, endianness::big>(i)
+			};
 			return { name_index, { i } };
 		}
 
 		elements::of<
-			descriptor_index, reader<Iterator, reader_stage::attributes>
+			constant::descriptor_index,
+			reader<Iterator, reader_stage::attributes>
 		>
 		read_and_get_attributes_reader() const
 		requires (Stage == reader_stage::descriptor_index) {
 			Iterator i = iterator_;
-			descriptor_index desc_index{ ::read<uint16, endianness::big>(i) };
+			constant::descriptor_index desc_index {
+				::read<uint16, endianness::big>(i)
+			};
 			return { desc_index, { i } };
 		}
 

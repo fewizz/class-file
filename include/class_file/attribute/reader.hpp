@@ -27,7 +27,7 @@ namespace class_file::attribute {
 			IndexToUtf8Mapper&& mapper, Handler&& handler
 		) const {
 			Iterator i = iterator_;
-			uint16 name_index = read<uint16, endianness::big>(i);
+			constant::utf8_index name_index{ read<uint16, endianness::big>(i) };
 			uint32 length = read<uint32, endianness::big>(i);
 			constant::utf8 name = mapper(name_index);
 

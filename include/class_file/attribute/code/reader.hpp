@@ -119,15 +119,19 @@ namespace class_file::attribute::code {
 					}
 
 					case 18: {
-						uint8 index = read<uint8>(i);
+						constant::index index { read<uint8>(i) };
 						action = handler(ldc{ index }, i); break;
 					}
 					case 19: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(ldc_w{ index }, i); break;
 					}
 					case 20: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(ldc_2_w{ index }, i); break;
 					}
 					case 21: {
@@ -428,35 +432,51 @@ namespace class_file::attribute::code {
 					};
 
 					case 178: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::field_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(get_static{ index }, i); break;
 					}
 					case 179: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::field_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(put_static{ index }, i); break;
 					}
 					case 180: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::field_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(get_field{ index }, i); break;
 					}
 					case 181: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::field_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(put_field{ index }, i); break;
 					}
 					case 182: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::method_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(invoke_virtual{ index }, i); break;
 					}
 					case 183: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::method_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(invoke_special{ index }, i); break;
 					}
 					case 184: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::method_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(invoke_static{ index }, i); break;
 					}
 					case 185: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::interface_method_ref_index index {
+							read<uint16, endianness::big>(i)
+						};
 						uint8 count = read<uint8>(i);
 						read<uint8>(i); // skip 0
 						action = handler(
@@ -470,25 +490,33 @@ namespace class_file::attribute::code {
 						action = handler(invoke_dynamic{ index }, i); break;
 					}
 					case 187: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::class_index index{
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(_new{ index }, i); break;
 					}
 					case 188: {
-						uint8 type = read<uint8>(i);
+						new_array_type type{ (new_array_type) read<uint8>(i) };
 						action = handler(new_array{ type }, i); break;
 					}
 					case 189: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::class_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(a_new_array{ index }, i); break;
 					}
 					case 190: action = handler(array_length{}, i); break;
 					case 191: action = handler(a_throw{}, i); break;
 					case 192: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::class_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(check_cast{ index }, i); break;
 					}
 					case 193: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::class_index index {
+							read<uint16, endianness::big>(i)
+						};
 						action = handler(instance_of{ index }, i); break;
 					}
 					case 194: action = handler(monitor_enter{}, i); break;
@@ -564,7 +592,9 @@ namespace class_file::attribute::code {
 				uint16 start_pc = read<uint16, endianness::big>(cpy);
 				uint16 end_pc = read<uint16, endianness::big>(cpy);
 				uint16 handler_pc = read<uint16, endianness::big>(cpy);
-				uint16 catch_type = read<uint16, endianness::big>(cpy);
+				constant::class_index catch_type {
+					read<uint16, endianness::big>(cpy)
+				};
 
 				loop_action action = handler(exception_handler {
 					start_pc, end_pc,

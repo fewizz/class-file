@@ -3,27 +3,58 @@
 #include <core/integer.hpp>
 #include <core/span.hpp>
 
-namespace class_file {
+namespace class_file::constant {
 
-	class utf8_index {
+	class index {
 		uint16 value_;
 	public:
-		explicit utf8_index(uint16 value) : value_{ value } {}
+		explicit index(uint16 value) : value_{ value } {}
 		operator uint16& () { return value_; }
+		operator const uint16& () const { return value_; }
 	};
 
-	class class_index {
-		uint16 value_;
-	public:
-		explicit class_index(uint16 value) : value_{ value } {}
-		operator uint16& () { return value_; }
+	class utf8_index : public index {
+		using index::index;
 	};
 
-	class name_and_type_index {
-		uint16 value_;
-	public:
-		explicit name_and_type_index(uint16 value) : value_{ value } {}
-		operator uint16& () { return value_; }
+	class int_index : public index {
+		using index::index;
+	};
+
+	class float_index : public index {
+		using index::index;
+	};
+
+	class long_index : public index {
+		using index::index;
+	};
+
+	class double_index : public index {
+		using index::index;
+	};
+
+	class class_index : public index {
+		using index::index;
+	};
+
+	class string_index : public index {
+		using index::index;
+	};
+
+	class field_ref_index : public index {
+		using index::index;
+	};
+
+	class method_ref_index : public index {
+		using index::index;
+	};
+
+	class interface_method_ref_index : public index {
+		using index::index;
+	};
+
+	class name_and_type_index : public index{
+		using index::index;
 	};
 
 	class name_index : public utf8_index {
@@ -37,10 +68,6 @@ namespace class_file {
 	class interface_index : public class_index {
 		using class_index::class_index;
 	};
-
-}
-
-namespace class_file::constant {
 
 	struct unknown {
 		uint8 tag;
@@ -76,7 +103,7 @@ namespace class_file::constant {
 
 	struct _class {
 		static constexpr uint8 tag = 7;
-		utf8_index name_index;
+		name_index name_index;
 	};
 
 	struct string {
@@ -98,7 +125,7 @@ namespace class_file::constant {
 
 	struct interface_method_ref {
 		static constexpr uint8 tag = 11;
-		class_index interface_index;
+		interface_index interface_index;
 		name_and_type_index name_and_type_index;
 	};
 

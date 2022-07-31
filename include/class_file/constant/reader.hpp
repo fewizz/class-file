@@ -49,7 +49,7 @@ namespace class_file::constant {
 					break;
 				}
 				case constant::_class::tag : {
-					utf8_index name_index {
+					name_index name_index {
 						read<uint16, endianness::big>(i)
 					};
 					handler(constant::_class{ name_index });
@@ -83,7 +83,7 @@ namespace class_file::constant {
 					break;
 				}
 				case constant::interface_method_ref::tag : {
-					class_index class_index {
+					interface_index class_index {
 						read<uint16, endianness::big>(i)
 					};
 					name_and_type_index nat_index {

@@ -94,22 +94,26 @@ namespace class_file {
 		}
 
 		elements::of<
-			class_index, reader<Iterator, reader_stage::super_class>
+			constant::class_index, reader<Iterator, reader_stage::super_class>
 		>
 		read_and_get_super_class_reader() const
 		requires (Stage == reader_stage::this_class) {
 			Iterator i = iterator_;
-			class_index this_class_index{ read<uint16, endianness::big>(i) };
+			constant::class_index this_class_index {
+				read<uint16, endianness::big>(i)
+			};
 			return { this_class_index, { i } };
 		}
 
 		elements::of<
-			class_index, reader<Iterator, reader_stage::interfaces>
+			constant::class_index, reader<Iterator, reader_stage::interfaces>
 		>
 		read_and_get_interfaces_reader() const
 		requires (Stage == reader_stage::super_class) {
 			Iterator i = iterator_;
-			class_index super_class_index{ read<uint16, endianness::big>(i) };
+			constant::class_index super_class_index {
+				read<uint16, endianness::big>(i)
+			};
 			return { super_class_index, { i } };
 		}
 
@@ -126,7 +130,9 @@ namespace class_file {
 			Iterator i = iterator_;
 			uint16 count = read<uint16, endianness::big>(i);
 			for(uint16 x = 0; x < count; ++x) {
-				interface_index index{ read<uint16, endianness::big>(i) };
+				constant::interface_index index {
+					read<uint16, endianness::big>(i)
+				};
 				handler(index);
 			}
 			return { i };
