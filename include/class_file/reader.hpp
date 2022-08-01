@@ -178,6 +178,26 @@ namespace class_file {
 			return { i };
 		}
 
+		template<typename Mapper, typename Handler>
+		Iterator
+		read_and_get_advanced_iterator(
+			Mapper&& mapper, Handler&& handler
+		) const
+		requires (Stage == reader_stage::attributes) {
+			Iterator i = iterator_;
+			uint16 count = ::read<uint16, endianness::big>(i);
+			while(count > 0) {
+				--count;
+				i = attribute::reader{ i }.read_and_get_advanced_iterator(
+					forward<Mapper>(mapper),
+					[&](auto attribute_reader) {
+						handler(attribute_reader);
+					}
+				);
+			}
+			return i;
+		}
+
 	};
 
 	template<typename Iterator, reader_stage Stage = reader_stage::magic>

@@ -484,7 +484,9 @@ namespace class_file::attribute::code {
 						); break;
 					}
 					case 186: {
-						uint16 index = read<uint16, endianness::big>(i);
+						constant::invoke_dynamic_index index {
+							read<uint16, endianness::big>(i)
+						};
 						++i; // skip two zeros
 						++i;
 						action = handler(invoke_dynamic{ index }, i); break;

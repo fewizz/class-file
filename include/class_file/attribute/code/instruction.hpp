@@ -342,7 +342,7 @@ namespace class_file::attribute::code::instruction {
 	};
 	struct invoke_dynamic {
 		static constexpr uint8 code = 186;
-		uint16 index;
+		constant::invoke_dynamic_index index;
 	};
 
 	struct _new {

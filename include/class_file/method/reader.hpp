@@ -72,10 +72,10 @@ namespace class_file::method {
 			uint16 count{ ::read<uint16, endianness::big>(i) };
 			while(count > 0) {
 				--count;
-				i = attribute::reader{i}.read_and_get_advanced_iterator(
-					mapper,
-					[&](auto attribute){
-						handler(attribute);
+				i = attribute::reader{ i }.read_and_get_advanced_iterator(
+					forward<Mapper>(mapper),
+					[&](auto attribute_reader) {
+						handler(attribute_reader);
 					}
 				);
 			}

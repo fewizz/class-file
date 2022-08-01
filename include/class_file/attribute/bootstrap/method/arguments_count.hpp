@@ -4,10 +4,13 @@
 
 namespace class_file::attribute::bootstrap::method {
 
-	struct arguments_count {
-		uint16 _;
+	class arguments_count {
+		uint16 value_;
+	public:
 
-		operator uint16 () { return _; }
+		arguments_count(uint16 value) : value_{ value } {}
+
+		operator uint16& () { return value_; }
 	};
 
 }

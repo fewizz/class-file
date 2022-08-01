@@ -4,9 +4,13 @@
 
 namespace class_file::attribute::bootstrap::methods {
 
-	struct count {
-		uint32 _;
-		operator uint32 () { return _; }
+	class count {
+		uint16 value_;
+	public:
+
+		count(uint16 value) : value_{ value } {}
+
+		operator uint16& () { return value_; }
 	};
 
 }

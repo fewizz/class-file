@@ -11,8 +11,7 @@ namespace class_file::attribute::bootstrap::methods {
 
 	enum class reader_stage {
 		count,
-		methods,
-		end
+		methods
 	};
 
 	template<typename Iterator, reader_stage Stage = reader_stage::count>
@@ -26,22 +25,26 @@ namespace class_file::attribute::bootstrap::methods {
 			type::bootstrap_methods
 		};
 
-		elements::of<reader<Iterator, reader_stage::methods>, methods::count>
-		operator () () requires (Stage == reader_stage::count) {
-			Iterator cpy = iterator_;
-			uint32 length = read<uint32>(cpy);
-			return { { cpy }, { length } };
+		elements::of<methods::count, reader<Iterator, reader_stage::methods>>
+		read_count_and_get_methods_reader()
+		requires (Stage == reader_stage::count)
+		{
+			Iterator i = iterator_;
+			methods::count count { ::read<uint16>(i) };
+			return { { count }, { i } };
 		}
 
 		template<typename Handler>
 		requires (Stage == reader_stage::methods)
-		reader<Iterator, reader_stage::end>
-		operator () (methods::count count, Handler&& handler) {
-			Iterator cpy = iterator_;
+		void
+		read(
+			methods::count count, Handler&& handler
+		) {
+			Iterator i = iterator_;
 
 			while(count > 0) {
-				--count._;
-				handler(bootstrap::method::reader{ cpy });
+				--count;
+				handler(bootstrap::method::reader{ i });
 			}
 		}
 

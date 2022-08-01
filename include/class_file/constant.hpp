@@ -57,6 +57,14 @@ namespace class_file::constant {
 		using index::index;
 	};
 
+	class method_handle_index : public index{
+		using index::index;
+	};
+
+	class invoke_dynamic_index : public index{
+		using index::index;
+	};
+
 	class name_index : public utf8_index {
 		using utf8_index::utf8_index;
 	};

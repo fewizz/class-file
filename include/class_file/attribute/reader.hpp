@@ -2,7 +2,7 @@
 
 #include "../constant.hpp"
 #include "code/reader.hpp"
-//#include "bootstrap/methods/reader.hpp"
+#include "bootstrap/methods/reader.hpp"
 
 #include <core/read.hpp>
 #include <core/meta/elements/one_of.hpp>
@@ -27,16 +27,16 @@ namespace class_file::attribute {
 			IndexToUtf8Mapper&& mapper, Handler&& handler
 		) const {
 			Iterator i = iterator_;
-			constant::utf8_index name_index{ read<uint16, endianness::big>(i) };
+			constant::name_index name_index{ read<uint16, endianness::big>(i) };
 			uint32 length = read<uint32, endianness::big>(i);
 			constant::utf8 name = mapper(name_index);
 
 			if(equals(name, c_string{ "Code" })) {
 				handler(code::reader{ i });
 			}
-			//else if(equals(name, c_string{ "BootstrapMethods" })) {
-			//	handler(bootstrap::methods::reader{ cpy });
-			//}
+			else if(equals(name, c_string{ "BootstrapMethods" })) {
+				handler(bootstrap::methods::reader{ i });
+			}
 
 			i += length;
 			return i;
