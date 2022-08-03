@@ -145,7 +145,17 @@ namespace class_file::constant {
 
 	struct method_handle {
 		static constexpr uint8 tag = 15;
-		uint8 reference_kind;
+		enum class behavior_kind : uint8 {
+			get_field = 1,
+			get_static,
+			put_field,
+			put_static,
+			invoke_virtual,
+			invoke_static,
+			invoke_special,
+			new_invoke_special,
+			invoke_interface
+		} kind;
 		uint16 reference_index;
 	};
 

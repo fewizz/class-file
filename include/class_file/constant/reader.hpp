@@ -20,108 +20,116 @@ namespace class_file::constant {
 			uint8 tag = *i++;
 
 			switch (tag) {
-				case constant::utf8::tag : {
+				case utf8::tag : {
 					uint16 len = read<uint16, endianness::big>(i);
-					handler(constant::utf8{ (char*) i, len });
+					handler(utf8{ (char*) i, len });
 					i += len;
 					break;
 				}
-				case constant::_int::tag : {
+				case _int::tag : {
 					int32 value = read<int32, endianness::big>(i);
-					handler(constant::_int{ value });
+					handler(_int{ value });
 					break;
 				}
-				case constant::_float::tag : {
+				case _float::tag : {
 					float value = read<float, endianness::big>(i);
-					handler(constant::_float{ value });
+					handler(_float{ value });
 					break;
 				}
-				case constant::_long::tag : {
+				case _long::tag : {
 					int64 val = read<uint64, endianness::big>(i);
-					handler(constant::_long{ val });
-					handler(constant::skip{});
+					handler(_long{ val });
+					handler(skip{});
 					break;
 				}
-				case constant::_double::tag : {
+				case _double::tag : {
 					double value = read<double, endianness::big>(i);
-					handler(constant::_double{ value });
-					handler(constant::skip{});
+					handler(_double{ value });
+					handler(skip{});
 					break;
 				}
-				case constant::_class::tag : {
+				case _class::tag : {
 					name_index name_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::_class{ name_index });
+					handler(_class{ name_index });
 					break;
 				}
-				case constant::string::tag : {
+				case string::tag : {
 					utf8_index string_content_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::string{ string_content_index });
+					handler(string{ string_content_index });
 					break;
 				}
-				case constant::field_ref::tag : {
+				case field_ref::tag : {
 					class_index class_index {
 						read<uint16, endianness::big>(i)
 					};
 					name_and_type_index nat_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::field_ref{ class_index, nat_index });
+					handler(field_ref{ class_index, nat_index });
 					break;
 				}
-				case constant::method_ref::tag : {
+				case method_ref::tag : {
 					class_index class_index {
 						read<uint16, endianness::big>(i)
 					};
 					name_and_type_index nat_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::method_ref{ class_index, nat_index });
+					handler(method_ref{ class_index, nat_index });
 					break;
 				}
-				case constant::interface_method_ref::tag : {
+				case interface_method_ref::tag : {
 					interface_index class_index {
 						read<uint16, endianness::big>(i)
 					};
 					name_and_type_index nat_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::interface_method_ref {
+					handler(interface_method_ref {
 						class_index, nat_index
 					});
 					break;
 				}
-				case constant::name_and_type::tag : {
+				case name_and_type::tag : {
 					name_index name_index {
 						read<uint16, endianness::big>(i)
 					};
 					descriptor_index desc_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(
-						constant::name_and_type {
-							name_index,
-							desc_index
-						});
+					handler(name_and_type{ name_index, desc_index });
 					break;
 				}
-				case constant::method_handle::tag : {
-					uint8 kind = *i++;
+				case method_handle::tag : {
+					method_handle::behavior_kind kind {
+						(method_handle::behavior_kind) read<uint8>(i)
+					};
 					uint16 index = read<uint16, endianness::big>(i);
-					handler(constant::method_handle{ kind, index });
+					handler(method_handle{ kind, index });
 					break;
 				}
-				case constant::method_type::tag : {
+				case method_type::tag : {
 					descriptor_index desc_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::method_type{ desc_index });
+					handler(method_type{ desc_index });
 					break;
 				}
-				case constant::dynamic::tag : {
+				case dynamic::tag : {
+					uint16 method_attr_index {
+						read<uint16, endianness::big>(i)
+					};
+					name_and_type_index name_and_type_index {
+						read<uint16, endianness::big>(i)
+					};
+					handler(dynamic{ method_attr_index, name_and_type_index });
+					break;
+				}
+				case invoke_dynamic::tag : {
 					uint16 method_attr_index {
 						read<uint16, endianness::big>(i)
 					};
@@ -129,41 +137,27 @@ namespace class_file::constant {
 						read<uint16, endianness::big>(i)
 					};
 					handler(
-						constant::dynamic {
-							method_attr_index, name_and_type_index
-						}
-					);
-					break;
-				}
-				case constant::invoke_dynamic::tag : {
-					uint16 method_attr_index {
-						read<uint16, endianness::big>(i)
-					};
-					name_and_type_index name_and_type_index {
-						read<uint16, endianness::big>(i)
-					};
-					handler(
-						constant::invoke_dynamic {
+						invoke_dynamic {
 							method_attr_index,
 							name_and_type_index
 						});
 					break;
 				}
-				case constant::module::tag : {
+				case module::tag : {
 					name_index name_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::module{ name_index });
+					handler(module{ name_index });
 					break;
 				}
-				case constant::package::tag : {
+				case package::tag : {
 					name_index name_index {
 						read<uint16, endianness::big>(i)
 					};
-					handler(constant::package{ name_index });
+					handler(package{ name_index });
 					break;
 				}
-				default: handler(constant::unknown{ tag });
+				default: handler(unknown{ tag });
 			}
 
 			return i;
