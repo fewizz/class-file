@@ -32,7 +32,7 @@ namespace class_file::attribute::bootstrap::method {
 		{
 			Iterator i = iterator_;
 			constant::method_handle_index reference_index {
-				::read<uint16>(i)
+				::read<uint16, endianness::big>(i)
 			};
 			return { reference_index, { i } };
 		}
@@ -45,7 +45,9 @@ namespace class_file::attribute::bootstrap::method {
 		requires (Stage == reader_stage::arguments_count)
 		{
 			Iterator i = iterator_;
-			arguments_count arguments_count{ ::read<uint16>(i) };
+			arguments_count arguments_count {
+				::read<uint16, endianness::big>(i)
+			};
 			return { arguments_count, { i } };
 		}
 
@@ -59,7 +61,9 @@ namespace class_file::attribute::bootstrap::method {
 
 			while(arguments_count > 0) {
 				--arguments_count;
-				argument_index argument_index{ ::read<uint16>(i) };
+				argument_index argument_index {
+					::read<uint16, endianness::big>(i)
+				};
 				handler(argument_index);
 			}
 		}

@@ -30,8 +30,8 @@ namespace class_file::attribute::bootstrap::methods {
 		requires (Stage == reader_stage::count)
 		{
 			Iterator i = iterator_;
-			methods::count count { ::read<uint16>(i) };
-			return { { count }, { i } };
+			methods::count count { ::read<uint16, endianness::big>(i) };
+			return { count, { i } };
 		}
 
 		template<typename Handler>

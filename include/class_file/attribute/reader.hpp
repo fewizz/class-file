@@ -27,7 +27,9 @@ namespace class_file::attribute {
 			IndexToUtf8Mapper&& mapper, Handler&& handler
 		) const {
 			Iterator i = iterator_;
-			constant::name_index name_index{ read<uint16, endianness::big>(i) };
+			constant::name_index name_index {
+				read<uint16, endianness::big>(i)
+			};
 			uint32 length = read<uint32, endianness::big>(i);
 			constant::utf8 name = mapper(name_index);
 
@@ -44,8 +46,9 @@ namespace class_file::attribute {
 
 		Iterator skip_and_get_advanced_iterator() const {
 			Iterator i = iterator_;
-			read<uint16, endianness::big>(i);
+			read<uint16, endianness::big>(i); // skip attribute index
 			uint32 length = read<uint32, endianness::big>(i);
+
 			i += length;
 			return i;
 		}
