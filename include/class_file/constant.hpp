@@ -1,13 +1,14 @@
 #pragma once
 
-#include <core/integer.hpp>
-#include <core/span.hpp>
+#include <integer.hpp>
+#include <span.hpp>
 
 namespace class_file::constant {
 
 	class index {
 		uint16 value_;
 	public:
+		index() = default;
 		explicit index(uint16 value) : value_{ value } {}
 		operator uint16& () { return value_; }
 		operator const uint16& () const { return value_; }

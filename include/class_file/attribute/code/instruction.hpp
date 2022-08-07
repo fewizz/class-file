@@ -2,7 +2,7 @@
 
 #include "../../constant.hpp"
 
-#include <core/span.hpp>
+#include <span.hpp>
 
 namespace class_file::attribute::code::instruction {
 
@@ -338,7 +338,8 @@ namespace class_file::attribute::code::instruction {
 	};
 	struct invoke_interface {
 		static constexpr uint8 code = 185;
-		constant::interface_method_ref_index index; uint8 count;
+		constant::interface_method_ref_index index;
+		uint8 count;
 	};
 	struct invoke_dynamic {
 		static constexpr uint8 code = 186;

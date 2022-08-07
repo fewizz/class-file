@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/integer.hpp>
+#include <integer.hpp>
 
 namespace class_file::attribute::bootstrap::method {
 

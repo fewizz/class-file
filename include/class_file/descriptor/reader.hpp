@@ -3,6 +3,8 @@
 #include "type.hpp"
 
 #include <core/meta/elements/of.hpp>
+#include <core/c_string.hpp>
+#include <core/distance.hpp>
 
 namespace class_file::descriptor {
 
@@ -90,6 +92,24 @@ namespace class_file::descriptor {
 			}
 			++cpy;
 			return { { cpy }, true };
+		}
+
+		template<typename Handler>
+		elements::of<method_reader<Iterator, method_reader_stage::ret>, bool>
+		parameter_names(Handler&& handler) const
+		requires(Stage == method_reader_stage::parameters) {
+			Iterator i = iterator;
+			if(*i != '(') return { { iterator }, false };
+			++i;
+			while(*i != ')') {
+				Iterator begin = i;
+				bool result = read_field(i, [](auto){ return true; });
+				if(!result) return { { iterator }, false };
+				Iterator end = i;
+				handler(c_string{ begin, distance(begin , end) });
+			}
+			++i;
+			return { { i }, true };
 		}
 
 		elements::of<method_reader<Iterator, method_reader_stage::ret>, bool>

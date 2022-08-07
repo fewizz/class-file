@@ -4,8 +4,8 @@
 #include "../method/reader.hpp"
 #include "../../type.hpp"
 
-#include <core/read.hpp>
-#include <core/meta/elements/of.hpp>
+#include <read.hpp>
+#include <elements/of.hpp>
 
 namespace class_file::attribute::bootstrap::methods {
 

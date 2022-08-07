@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/flag_enum.hpp>
+#include <enum_flags.hpp>
 
 namespace class_file {
 
@@ -23,8 +23,8 @@ namespace class_file {
 		_module    = 0x8000
 	};
 
-	struct access_flags : flag_enum<access_flag> {
-		using base_type = flag_enum<access_flag>;
+	struct access_flags : enum_flags<access_flag> {
+		using base_type = enum_flags<access_flag>;
 		using base_type::base_type;
 
 		bool _public()    { return base_type::get(access_flag::_public);    }

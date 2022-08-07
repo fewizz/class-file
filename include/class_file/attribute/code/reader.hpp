@@ -4,15 +4,16 @@
 #include "exception_handler.hpp"
 #include "../type.hpp"
 
-#include <core/meta/elements/of.hpp>
-#include <core/loop_action.hpp>
-#include <core/read.hpp>
+#include <elements/of.hpp>
+#include <loop_action.hpp>
+#include <read.hpp>
 
 namespace class_file::attribute::code {
 
 	enum class reader_stage {
 		max_stack,
 		max_locals,
+		code_length,
 		code,
 		exception_table,
 		attributes
@@ -35,7 +36,7 @@ namespace class_file::attribute::code {
 			return { { i }, { max_stack } };
 		}
 
-		elements::of<reader<Iterator, reader_stage::code>, uint16>
+		elements::of<reader<Iterator, reader_stage::code_length>, uint16>
 		operator () () const
 		requires (Stage == reader_stage::max_locals) {
 			Iterator i = iterator_;
@@ -45,7 +46,7 @@ namespace class_file::attribute::code {
 
 		reader<Iterator, reader_stage::exception_table>
 		skip () const
-		requires (Stage == reader_stage::code) {
+		requires (Stage == reader_stage::code_length) {
 			Iterator i = iterator_;
 			uint32 length = read<uint32, endianness::big>(i);
 			Iterator end = iterator_ + length;
@@ -57,7 +58,7 @@ namespace class_file::attribute::code {
 			span<uint8, uint32>
 		>
 		as_span () const
-		requires (Stage == reader_stage::code) {
+		requires (Stage == reader_stage::code_length) {
 			Iterator i = iterator_;
 			uint32 length = read<uint32, endianness::big>(i);
 			Iterator end = i + length;
@@ -70,10 +71,12 @@ namespace class_file::attribute::code {
 		template<typename Handler>
 		reader<Iterator, reader_stage::exception_table>
 		operator () (Handler&& handler) const
-		requires (Stage == reader_stage::code) {
+		requires (Stage == reader_stage::code_length) {
 			Iterator i = iterator_;
 			uint32 length = read<uint32, endianness::big>(i);
-			return (*this)(forward<Handler>(handler), length);
+			return reader<Iterator, reader_stage::code>{ i }(
+				forward<Handler>(handler), length
+			);
 		}
 
 		template<typename Handler>

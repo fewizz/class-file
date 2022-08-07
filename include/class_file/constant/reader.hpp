@@ -2,8 +2,8 @@
 
 #include "../constant.hpp"
 
-#include <core/integer.hpp>
-#include <core/read.hpp>
+#include <integer.hpp>
+#include <read.hpp>
 
 namespace class_file::constant {
 

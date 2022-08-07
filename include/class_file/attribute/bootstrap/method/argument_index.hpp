@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../constant.hpp"
-#include <core/integer.hpp>
+#include <integer.hpp>
 
 namespace class_file::attribute::bootstrap::method {
 

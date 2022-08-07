@@ -3,8 +3,8 @@
 #include "./arguments_count.hpp"
 #include "./argument_index.hpp"
 
-#include <core/meta/elements/of.hpp>
-#include <core/read.hpp>
+#include <elements/of.hpp>
+#include <read.hpp>
 
 namespace class_file::attribute::bootstrap::method {
 

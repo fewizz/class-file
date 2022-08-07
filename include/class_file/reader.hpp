@@ -8,9 +8,8 @@
 #include "method/reader.hpp"
 #include "constant/reader.hpp"
 
-#include <core/meta/elements/of.hpp>
-#include <core/array.hpp>
-#include <core/equals.hpp>
+#include <elements/of.hpp>
+#include <array.hpp>
 
 namespace class_file {
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <core/integer.hpp>
+#include "../../constant.hpp"
 
-#include <class_file/constant.hpp>
+#include <integer.hpp>
 
 namespace class_file::attribute::code {
 

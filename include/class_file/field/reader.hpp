@@ -4,8 +4,8 @@
 
 #include "../attribute/reader.hpp"
 
-#include <core/meta/elements/of.hpp>
-#include <core/read.hpp>
+#include <elements/of.hpp>
+#include <read.hpp>
 
 namespace class_file::field {
 
