@@ -86,7 +86,9 @@ namespace class_file::constant {
 
 	struct utf8 : span<const char, uint16> {
 		static constexpr uint8 tag = 1;
+	private:
 		using base_type = span<const char, uint16>;
+	public:
 		using base_type::base_type;
 	};
 

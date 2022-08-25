@@ -2,9 +2,9 @@
 
 #include "type.hpp"
 
-#include <core/meta/elements/of.hpp>
-#include <core/c_string.hpp>
-#include <core/distance.hpp>
+#include <elements/of.hpp>
+#include <c_string.hpp>
+#include <iterator_and_sentinel.hpp>
 
 namespace class_file::descriptor {
 
@@ -96,7 +96,7 @@ namespace class_file::descriptor {
 
 		template<typename Handler>
 		elements::of<method_reader<Iterator, method_reader_stage::ret>, bool>
-		parameter_names(Handler&& handler) const
+		parameters_names(Handler&& handler) const
 		requires(Stage == method_reader_stage::parameters) {
 			Iterator i = iterator;
 			if(*i != '(') return { { iterator }, false };
@@ -106,7 +106,10 @@ namespace class_file::descriptor {
 				bool result = read_field(i, [](auto){ return true; });
 				if(!result) return { { iterator }, false };
 				Iterator end = i;
-				handler(c_string{ begin, distance(begin , end) });
+				handler(c_string {
+					(const char*) begin,
+					iterator_and_sentinel{ begin, end }.distance()
+				});
 			}
 			++i;
 			return { { i }, true };

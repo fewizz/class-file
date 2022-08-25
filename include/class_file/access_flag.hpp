@@ -27,22 +27,70 @@ namespace class_file {
 		using base_type = enum_flags<access_flag>;
 		using base_type::base_type;
 
-		bool _public()    { return base_type::get(access_flag::_public);    }
-		bool _private()   { return base_type::get(access_flag::_private);   }
-		bool _protected() { return base_type::get(access_flag::_protected); }
-		bool _static()    { return base_type::get(access_flag::_static);    }
-		bool _final()     { return base_type::get(access_flag::_final);     }
-		bool super()      { return base_type::get(access_flag::super);      }
-		bool bridge()     { return base_type::get(access_flag::bridge);     }
-		bool varargs()    { return base_type::get(access_flag::varargs);    }
-		bool native()     { return base_type::get(access_flag::native);     }
-		bool interface()  { return base_type::get(access_flag::interface);  }
-		bool abstract()   { return base_type::get(access_flag::abstract);   }
-		bool strict()     { return base_type::get(access_flag::strict);     }
-		bool synthetic()  { return base_type::get(access_flag::synthetic);  }
-		bool annotation() { return base_type::get(access_flag::annotation); }
-		bool _enum()      { return base_type::get(access_flag::_enum);      }
-		bool _module()    { return base_type::get(access_flag::_module);    }
+		bool _public()    const {
+			return base_type::get(access_flag::_public);
+		}
+
+		bool _private()   const {
+			return base_type::get(access_flag::_private);
+		}
+
+		bool _protected() const {
+			return base_type::get(access_flag::_protected);
+		}
+
+		bool _static()    const {
+			return base_type::get(access_flag::_static);
+		}
+
+		bool _final()     const {
+			return base_type::get(access_flag::_final);
+		}
+
+		bool super()      const {
+			return base_type::get(access_flag::super);
+		}
+
+		bool bridge()     const {
+			return base_type::get(access_flag::bridge);
+		}
+
+		bool varargs()    const {
+			return base_type::get(access_flag::varargs);
+		}
+
+		bool native()     const {
+			return base_type::get(access_flag::native);
+		}
+
+		bool interface()  const {
+			return base_type::get(access_flag::interface);
+		}
+
+		bool abstract()   const {
+			return base_type::get(access_flag::abstract);
+		}
+
+		bool strict()     const {
+			return base_type::get(access_flag::strict);
+		}
+
+		bool synthetic()  const {
+			return base_type::get(access_flag::synthetic);
+		}
+
+		bool annotation() const {
+			return base_type::get(access_flag::annotation);
+		}
+
+		bool _enum()      const {
+			return base_type::get(access_flag::_enum);
+		}
+
+		bool _module()    const {
+			return base_type::get(access_flag::_module);
+		}
+
 	};
 
 }

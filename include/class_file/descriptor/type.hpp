@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/span.hpp>
+#include <span.hpp>
 
 namespace class_file::descriptor {
 
