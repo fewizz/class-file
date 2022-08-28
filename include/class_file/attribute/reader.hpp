@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../constant.hpp"
-#include "code/reader.hpp"
-#include "bootstrap/methods/reader.hpp"
+#include "./code/reader.hpp"
+#include "./bootstrap_methods/reader.hpp"
 
 #include <read.hpp>
 #include <elements/one_of.hpp>
@@ -37,7 +37,7 @@ namespace class_file::attribute {
 				handler(code::reader{ i });
 			}
 			else if(range{name}.equals_to(c_string{ "BootstrapMethods" })) {
-				handler(bootstrap::methods::reader{ i });
+				handler(bootstrap_methods::reader{ i });
 			}
 
 			i += length;

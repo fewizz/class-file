@@ -1,7 +1,7 @@
 #pragma once
 
 #include "./arguments_count.hpp"
-#include "./argument_index.hpp"
+#include "../../constant.hpp"
 
 #include <elements/of.hpp>
 #include <read.hpp>
@@ -61,7 +61,7 @@ namespace class_file::attribute::bootstrap::method {
 
 			while(arguments_count > 0) {
 				--arguments_count;
-				argument_index argument_index {
+				constant::index argument_index {
 					::read<uint16, endianness::big>(i)
 				};
 				handler(argument_index);

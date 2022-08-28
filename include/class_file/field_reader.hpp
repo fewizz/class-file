@@ -1,13 +1,12 @@
 #pragma once
 
-#include "../access_flag.hpp"
-
-#include "../attribute/reader.hpp"
+#include "./access_flag.hpp"
+#include "./attribute/reader.hpp"
 
 #include <elements/of.hpp>
 #include <read.hpp>
 
-namespace class_file::method {
+namespace class_file::field {
 
 	enum class reader_stage {
 		access_flags,
@@ -23,15 +22,15 @@ namespace class_file::method {
 
 		reader(Iterator it) : iterator_{ it } {}
 
-		Iterator iterator_copy() {
-			return iterator_;
-		}
+		Iterator iterator_copy() { return iterator_; }
 
-		elements::of<access_flags, reader<Iterator, reader_stage::name_index>>
+		elements::of<
+			access_flags, reader<Iterator, reader_stage::name_index>
+		>
 		read_access_flags_and_get_name_index_reader() const
 		requires (Stage == reader_stage::access_flags) {
-			Iterator i = iterator_;
-			access_flag flags {
+			Iterator i{ iterator_ };
+			access_flags flags {
 				(access_flag) ::read<uint16, endianness::big>(i)
 			};
 			return { flags, { i } };
@@ -43,7 +42,7 @@ namespace class_file::method {
 		>
 		read_and_get_descriptor_index_reader() const
 		requires (Stage == reader_stage::name_index) {
-			Iterator i = iterator_;
+			Iterator i{ iterator_ };
 			constant::name_index name_index {
 				::read<uint16, endianness::big>(i)
 			};
@@ -56,7 +55,7 @@ namespace class_file::method {
 		>
 		read_and_get_attributes_reader() const
 		requires (Stage == reader_stage::descriptor_index) {
-			Iterator i = iterator_;
+			Iterator i{ iterator_ };
 			constant::descriptor_index desc_index {
 				::read<uint16, endianness::big>(i)
 			};
@@ -72,10 +71,10 @@ namespace class_file::method {
 			uint16 count{ ::read<uint16, endianness::big>(i) };
 			while(count > 0) {
 				--count;
-				i = attribute::reader{ i }.read_and_get_advanced_iterator(
-					forward<Mapper>(mapper),
-					[&](auto attribute_reader) {
-						handler(attribute_reader);
+				i = attribute::reader{i}.read_and_get_advanced_iterator(
+					mapper,
+					[&](auto attribute) {
+						handler(attribute);
 					}
 				);
 			}

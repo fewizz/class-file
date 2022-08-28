@@ -159,7 +159,7 @@ namespace class_file::constant {
 			new_invoke_special,
 			invoke_interface
 		} kind;
-		uint16 reference_index;
+		constant::index reference_index;
 	};
 
 	struct method_type {

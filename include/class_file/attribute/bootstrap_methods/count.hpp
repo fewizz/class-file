@@ -2,7 +2,7 @@
 
 #include <integer.hpp>
 
-namespace class_file::attribute::bootstrap::methods {
+namespace class_file::attribute::bootstrap_methods {
 
 	class count {
 		uint16 value_;

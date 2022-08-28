@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../constant.hpp"
+#include "./constant.hpp"
 
 #include <integer.hpp>
 #include <read.hpp>
@@ -108,7 +108,7 @@ namespace class_file::constant {
 					method_handle::behavior_kind kind {
 						(method_handle::behavior_kind) read<uint8>(i)
 					};
-					uint16 index = read<uint16, endianness::big>(i);
+					constant::index index{ read<uint16, endianness::big>(i) };
 					handler(method_handle{ kind, index });
 					break;
 				}

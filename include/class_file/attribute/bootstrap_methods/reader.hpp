@@ -1,13 +1,13 @@
 #pragma once
 
 #include "./count.hpp"
-#include "../method/reader.hpp"
-#include "../../type.hpp"
+#include "./method_reader.hpp"
+#include "../type.hpp"
 
 #include <read.hpp>
 #include <elements/of.hpp>
 
-namespace class_file::attribute::bootstrap::methods {
+namespace class_file::attribute::bootstrap_methods {
 
 	enum class reader_stage {
 		count,
@@ -25,12 +25,17 @@ namespace class_file::attribute::bootstrap::methods {
 			type::bootstrap_methods
 		};
 
-		elements::of<methods::count, reader<Iterator, reader_stage::methods>>
+		elements::of<
+			bootstrap_methods::count,
+			reader<Iterator, reader_stage::methods>
+		>
 		read_count_and_get_methods_reader()
 		requires (Stage == reader_stage::count)
 		{
 			Iterator i = iterator_;
-			methods::count count { ::read<uint16, endianness::big>(i) };
+			bootstrap_methods::count count {
+				::read<uint16, endianness::big>(i)
+			};
 			return { count, { i } };
 		}
 
@@ -38,7 +43,7 @@ namespace class_file::attribute::bootstrap::methods {
 		requires (Stage == reader_stage::methods)
 		void
 		read(
-			methods::count count, Handler&& handler
+			bootstrap_methods::count count, Handler&& handler
 		) {
 			Iterator i = iterator_;
 

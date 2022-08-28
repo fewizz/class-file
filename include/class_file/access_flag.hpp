@@ -12,7 +12,7 @@ namespace class_file {
 		_final     = 0x0010,
 		super      = 0x0020,
 		bridge     = 0x0040,
-		varargs    = 0x0040,
+		varargs    = 0x0080,
 		native     = 0x0100,
 		interface  = 0x0200,
 		abstract   = 0x0400,

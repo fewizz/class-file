@@ -1,12 +1,12 @@
 #pragma once
 
-#include "version.hpp"
-#include "constant.hpp"
-#include "access_flag.hpp"
+#include "./version.hpp"
+#include "./constant.hpp"
+#include "./access_flag.hpp"
 
-#include "field/reader.hpp"
-#include "method/reader.hpp"
-#include "constant/reader.hpp"
+#include "./field_reader.hpp"
+#include "./method_reader.hpp"
+#include "./constant_reader.hpp"
 
 #include <elements/of.hpp>
 #include <array.hpp>
