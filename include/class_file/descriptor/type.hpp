@@ -4,26 +4,18 @@
 
 namespace class_file::descriptor {
 
-	struct V{};
+	struct v{};
 
-	struct B{}; struct C{}; struct D{}; struct F{};
-	struct I{}; struct J{}; struct S{}; struct Z{};
+	struct b{}; struct c{}; struct d{}; struct f{};
+	struct i{}; struct j{}; struct s{}; struct z{};
 
-	struct object_type : span<const char, uint16> {
-		using base_type = span<const char, uint16>;
-		using base_type::base_type;
+	struct object {
+		span<const char, uint16> class_name;
 	};
 
-	struct array_type : span<const char, uint16> {
-		using base_type = span<const char, uint16>;
-
-		nuint rank;
-
-		array_type(nuint rank, char* ptr, uint16 size) :
-			base_type{ ptr, size },
-			rank{ rank }
-		{}
-
+	struct array {
+		span<const char, uint16> component;
+		uint8 rank;
 	};
 
 } // descriptor
