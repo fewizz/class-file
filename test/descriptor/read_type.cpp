@@ -1,4 +1,4 @@
-#include "class_file/descriptor/method_reader.hpp"
+#include "class_file/descriptor/read_type.hpp"
 
 #include <c_string.hpp>
 #include <range.hpp>
@@ -15,6 +15,19 @@ bool consteval desc_type() {
 				if constexpr(!types_are_same<Type, i>) {
 					throw;
 				}
+			},
+			throw_on_error
+		);
+	}
+	{
+		read_type(
+			c_string{ "[F" }.iterator(),
+			[]<typename Type>(Type type) {
+				if constexpr(same_as<Type, class_file::descriptor::array>) {
+					if(!range{ type.component }.equals_to(c_string{"F"})) {
+						throw;
+					}
+				} else { throw; }
 			},
 			throw_on_error
 		);

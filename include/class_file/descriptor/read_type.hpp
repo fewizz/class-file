@@ -20,10 +20,13 @@ namespace class_file::descriptor {
 	void constexpr read_type(
 		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler
 	) {
+		using iterator_type = remove_reference<Iterator>;
+
 		auto read_without_array = [&](
-			Iterator& iterator, auto&& handler, auto&& error_handler
+			iterator_type& iterator, auto&& handler, auto&& error_handler
 		) {
-			uint8 c = *iterator++;
+			uint8 c = *iterator;
+			++iterator;
 			switch (c) {
 			case 'V': handler(descriptor::v{}); return;
 			case 'B': handler(descriptor::b{}); return;
@@ -35,11 +38,11 @@ namespace class_file::descriptor {
 			case 'S': handler(descriptor::s{}); return;
 			case 'Z': handler(descriptor::z{}); return;
 			case 'L': {
-				Iterator class_name_begining = iterator;
+				iterator_type class_name_begining = iterator;
 				while(*iterator != ';') {
 					++iterator;
 				}
-				Iterator class_name_ending = iterator;
+				iterator_type class_name_ending = iterator;
 				handler(descriptor::object {
 					.class_name {
 						(const char*) class_name_begining,
@@ -63,7 +66,7 @@ namespace class_file::descriptor {
 				++rank;
 				++iterator;
 			}
-			Iterator component_name_begining = iterator;
+			iterator_type component_name_begining = iterator;
 			bool error_happened = false;
 			read_without_array(
 				iterator,
@@ -74,7 +77,7 @@ namespace class_file::descriptor {
 				return;
 			}
 
-			Iterator component_name_ending = iterator;
+			iterator_type component_name_ending = iterator;
 			handler(descriptor::array {
 				.component {
 					(const char*) component_name_begining,
