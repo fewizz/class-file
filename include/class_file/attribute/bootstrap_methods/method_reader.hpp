@@ -3,7 +3,7 @@
 #include "./arguments_count.hpp"
 #include "../../constant.hpp"
 
-#include <elements/of.hpp>
+#include <tuple.hpp>
 #include <read.hpp>
 
 namespace class_file::attribute::bootstrap::method {
@@ -23,7 +23,7 @@ namespace class_file::attribute::bootstrap::method {
 
 		reader(Iterator it) : iterator_{ it } {}
 
-		elements::of<
+		tuple<
 			constant::method_handle_index,
 			reader<Iterator, reader_stage::arguments_count>
 		>
@@ -37,7 +37,7 @@ namespace class_file::attribute::bootstrap::method {
 			return { reference_index, { i } };
 		}
 
-		elements::of<
+		tuple<
 			arguments_count,
 			reader<Iterator, reader_stage::arguments>
 		>

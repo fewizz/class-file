@@ -3,7 +3,7 @@
 #include "./access_flag.hpp"
 #include "./attribute/reader.hpp"
 
-#include <elements/of.hpp>
+#include <tuple.hpp>
 #include <read.hpp>
 
 namespace class_file::field {
@@ -24,19 +24,19 @@ namespace class_file::field {
 
 		Iterator iterator_copy() { return iterator_; }
 
-		elements::of<
+		tuple<
 			access_flags, reader<Iterator, reader_stage::name_index>
 		>
 		read_access_flags_and_get_name_index_reader() const
 		requires (Stage == reader_stage::access_flags) {
 			Iterator i{ iterator_ };
 			access_flags flags {
-				(access_flag) ::read<uint16, endianness::big>(i)
+				::read<access_flags, endianness::big>(i)
 			};
 			return { flags, { i } };
 		}
 
-		elements::of<
+		tuple<
 			constant::name_index,
 			reader<Iterator, reader_stage::descriptor_index>
 		>
@@ -49,7 +49,7 @@ namespace class_file::field {
 			return { name_index, { i } };
 		}
 
-		elements::of<
+		tuple<
 			constant::descriptor_index,
 			reader<Iterator, reader_stage::attributes>
 		>

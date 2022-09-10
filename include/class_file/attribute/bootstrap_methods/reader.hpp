@@ -5,7 +5,7 @@
 #include "../type.hpp"
 
 #include <read.hpp>
-#include <elements/of.hpp>
+#include <tuple.hpp>
 
 namespace class_file::attribute::bootstrap_methods {
 
@@ -25,7 +25,7 @@ namespace class_file::attribute::bootstrap_methods {
 			type::bootstrap_methods
 		};
 
-		elements::of<
+		tuple<
 			bootstrap_methods::count,
 			reader<Iterator, reader_stage::methods>
 		>

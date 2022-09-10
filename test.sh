@@ -22,7 +22,7 @@ test() {
 		echo "success"
 	else
 		result=$?
-		echo "didn't pass"
+		echo "failure"
 		exit ${result}
 	fi
 }

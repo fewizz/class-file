@@ -5,7 +5,6 @@
 #include "./bootstrap_methods/reader.hpp"
 
 #include <read.hpp>
-#include <elements/one_of.hpp>
 #include <array.hpp>
 #include <range.hpp>
 #include <c_string.hpp>
@@ -33,10 +32,10 @@ namespace class_file::attribute {
 			uint32 length = read<uint32, endianness::big>(i);
 			constant::utf8 name = mapper(name_index);
 
-			if(range{name}.equals_to(c_string{ "Code" })) {
+			if(name.equals_to(c_string{ "Code" })) {
 				handler(code::reader{ i });
 			}
-			else if(range{name}.equals_to(c_string{ "BootstrapMethods" })) {
+			else if(name.equals_to(c_string{ "BootstrapMethods" })) {
 				handler(bootstrap_methods::reader{ i });
 			}
 

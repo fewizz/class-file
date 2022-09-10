@@ -8,7 +8,7 @@
 #include "./method_reader.hpp"
 #include "./constant_reader.hpp"
 
-#include <elements/of.hpp>
+#include <tuple.hpp>
 #include <array.hpp>
 
 namespace class_file {
@@ -28,7 +28,7 @@ namespace class_file {
 
 		reader(Iterator it) : iterator_{ it } {}
 
-		elements::of<bool, reader<Iterator, reader_stage::version>>
+		tuple<bool, reader<Iterator, reader_stage::version>>
 		check_for_magic_and_get_version_reader() const
 		requires (Stage == reader_stage::magic) {
 			Iterator i = iterator_;
@@ -37,7 +37,7 @@ namespace class_file {
 			return { result, { i } };
 		}
 
-		elements::of<
+		tuple<
 			class_file::version, reader<Iterator, reader_stage::constant_pool>
 		>
 		read_and_get_constant_pool_reader() const
@@ -80,19 +80,19 @@ namespace class_file {
 			return constant_pool_size;
 		}
 
-		elements::of<
+		tuple<
 			access_flags, reader<Iterator, reader_stage::this_class>
 		>
 		read_and_get_this_class_reader() const
 		requires (Stage == reader_stage::access_flags) {
 			Iterator i = iterator_;
 			class_file::access_flags flags {
-				(access_flag) read<uint16, endianness::big>(i)
+				read<access_flags, endianness::big>(i)
 			};
 			return { flags, { i } };
 		}
 
-		elements::of<
+		tuple<
 			constant::class_index, reader<Iterator, reader_stage::super_class>
 		>
 		read_and_get_super_class_reader() const
@@ -104,7 +104,7 @@ namespace class_file {
 			return { this_class_index, { i } };
 		}
 
-		elements::of<
+		tuple<
 			constant::class_index, reader<Iterator, reader_stage::interfaces>
 		>
 		read_and_get_interfaces_reader() const

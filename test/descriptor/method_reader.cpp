@@ -21,7 +21,7 @@ int main() {
 			else if constexpr(same_as<Type, class_file::descriptor::array>) {
 				if(param++ != 2) { last_result = 3; }
 				if(
-					!range{ type.component }.equals_to(c_string{ "I" }) ||
+					!type.component.have_elements_equal_to(c_string{ "I" }) ||
 					type.rank != 4
 				) {
 					last_result = 4;

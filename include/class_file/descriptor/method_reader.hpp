@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./read_type.hpp"
+#include <c_string.hpp>
 #include <optional.hpp>
 
 namespace class_file::descriptor::method {
@@ -100,11 +101,12 @@ namespace class_file::descriptor::method {
 		requires(Stage == reader_stage::parameters) {
 			uint8 count = 0;
 			bool error_happened = false;
-			operator()(
+			try_read_parameter_types_and_get_return_type_reader(
 				[&](auto){ ++count; },
 				[&](auto error) {
 					error_happened = true; error_handler(error);
-				});
+				}
+			);
 			if(error_happened) {
 				return {};
 			}

@@ -4,8 +4,8 @@
 #include "exception_handler.hpp"
 #include "../type.hpp"
 
-#include <elements/of.hpp>
 #include <loop_action.hpp>
+#include <tuple.hpp>
 #include <read.hpp>
 
 namespace class_file::attribute::code {
@@ -28,7 +28,7 @@ namespace class_file::attribute::code {
 
 		reader(Iterator it) : iterator_{ it } {}
 
-		elements::of<reader<Iterator, reader_stage::max_locals>, uint16>
+		tuple<reader<Iterator, reader_stage::max_locals>, uint16>
 		operator () () const
 		requires (Stage == reader_stage::max_stack) {
 			Iterator i = iterator_;
@@ -36,7 +36,7 @@ namespace class_file::attribute::code {
 			return { { i }, { max_stack } };
 		}
 
-		elements::of<reader<Iterator, reader_stage::code_length>, uint16>
+		tuple<reader<Iterator, reader_stage::code_length>, uint16>
 		operator () () const
 		requires (Stage == reader_stage::max_locals) {
 			Iterator i = iterator_;
@@ -53,7 +53,7 @@ namespace class_file::attribute::code {
 			return { end };
 		}
 
-		elements::of<
+		tuple<
 			reader<Iterator, reader_stage::exception_table>,
 			span<uint8, uint32>
 		>

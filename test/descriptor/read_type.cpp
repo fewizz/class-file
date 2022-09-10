@@ -2,6 +2,7 @@
 
 #include <c_string.hpp>
 #include <range.hpp>
+#include <types.hpp>
 
 bool consteval desc_type() {
 	using namespace class_file::descriptor;
@@ -24,7 +25,7 @@ bool consteval desc_type() {
 			c_string{ "[F" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(same_as<Type, class_file::descriptor::array>) {
-					if(!range{ type.component }.equals_to(c_string{"F"})) {
+					if(!type.component.have_elements_equal_to(c_string{"F"})) {
 						throw;
 					}
 				} else { throw; }
@@ -38,8 +39,8 @@ bool consteval desc_type() {
 			[]<typename Type>(Type type) {
 				if constexpr(types_are_same<Type, object>) {
 					if(
-						!range{ type.class_name }
-						.equals_to(c_string{ "java/lang/String" })
+						!type.class_name
+						.have_elements_equal_to(c_string{ "java/lang/String" })
 					) { throw; }
 				}
 				else { throw; }
@@ -53,8 +54,8 @@ bool consteval desc_type() {
 			[]<typename Type>(Type type) {
 				if constexpr(same_as<Type, class_file::descriptor::array>) {
 					if(
-						!range{ type.component }
-						.equals_to(c_string{ "Ljava/lang/String;" })
+						!type.component
+						.have_elements_equal_to(c_string{ "Ljava/lang/String;" })
 					) { throw; }
 					if(type.rank != 4) { throw; }
 				}
@@ -68,3 +69,5 @@ bool consteval desc_type() {
 }
 
 static_assert(desc_type());
+
+int main() {}

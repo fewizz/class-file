@@ -2,13 +2,8 @@
 
 #include "./type.hpp"
 
-#include <elements/of.hpp>
-#include <c_string.hpp>
-#include <expected.hpp>
 #include <iterator_and_sentinel.hpp>
-#include <types/common.hpp>
 #include <on_scope_exit.hpp>
-#include <optional.hpp>
 
 namespace class_file::descriptor {
 
@@ -49,7 +44,7 @@ namespace class_file::descriptor {
 						(uint16) iterator_and_sentinel {
 							class_name_begining,
 							class_name_ending
-						}.distance()
+						}.get_or_compute_distance()
 					}
 				});
 				++iterator; // skip ;
@@ -83,7 +78,7 @@ namespace class_file::descriptor {
 					(const char*) component_name_begining,
 					(uint16) iterator_and_sentinel {
 						component_name_begining, component_name_ending
-					}.distance()
+					}.get_or_compute_distance()
 				},
 				.rank = rank
 			});

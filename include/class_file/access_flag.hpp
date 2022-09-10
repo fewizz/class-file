@@ -23,74 +23,25 @@ namespace class_file {
 		_module    = 0x8000
 	};
 
-	struct access_flags : enum_flags<access_flag> {
-		using base_type = enum_flags<access_flag>;
-		using base_type::base_type;
-
-		bool _public()    const {
-			return base_type::get(access_flag::_public);
-		}
-
-		bool _private()   const {
-			return base_type::get(access_flag::_private);
-		}
-
-		bool _protected() const {
-			return base_type::get(access_flag::_protected);
-		}
-
-		bool _static()    const {
-			return base_type::get(access_flag::_static);
-		}
-
-		bool _final()     const {
-			return base_type::get(access_flag::_final);
-		}
-
-		bool super()      const {
-			return base_type::get(access_flag::super);
-		}
-
-		bool bridge()     const {
-			return base_type::get(access_flag::bridge);
-		}
-
-		bool varargs()    const {
-			return base_type::get(access_flag::varargs);
-		}
-
-		bool native()     const {
-			return base_type::get(access_flag::native);
-		}
-
-		bool interface()  const {
-			return base_type::get(access_flag::interface);
-		}
-
-		bool abstract()   const {
-			return base_type::get(access_flag::abstract);
-		}
-
-		bool strict()     const {
-			return base_type::get(access_flag::strict);
-		}
-
-		bool synthetic()  const {
-			return base_type::get(access_flag::synthetic);
-		}
-
-		bool annotation() const {
-			return base_type::get(access_flag::annotation);
-		}
-
-		bool _enum()      const {
-			return base_type::get(access_flag::_enum);
-		}
-
-		bool _module()    const {
-			return base_type::get(access_flag::_module);
-		}
-
+	struct access_flags {
+		bool _public   :1;
+		bool _private  :1;
+		bool _protected:1;
+		bool _static   :1;
+		bool _final    :1;
+		bool super     :1;
+		bool bridge    :1;
+		bool varargs   :1;
+		bool native    :1;
+		bool interface :1;
+		bool abstract  :1;
+		bool strict    :1;
+		bool synthetic :1;
+		bool annotation:1;
+		bool _enum     :1;
+		bool _module   :1;
 	};
+
+	static_assert(sizeof(access_flags) == 2);
 
 }
