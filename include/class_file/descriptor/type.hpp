@@ -2,7 +2,7 @@
 
 #include <span.hpp>
 
-namespace class_file::descriptor {
+namespace class_file {
 
 	struct v{};
 
@@ -18,4 +18,4 @@ namespace class_file::descriptor {
 		uint8 rank;
 	};
 
-} // descriptor
+}

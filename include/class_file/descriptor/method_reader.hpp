@@ -4,7 +4,7 @@
 #include <c_string.hpp>
 #include <optional.hpp>
 
-namespace class_file::descriptor::method {
+namespace class_file::method_descriptor {
 
 	enum class reader_stage {
 		parameters, ret
@@ -37,7 +37,7 @@ namespace class_file::descriptor::method {
 			++i;
 			while(*i != ')') {
 				bool error_happened = false;
-				read_type(
+				read_type_descriptor(
 					i,
 					handler,
 					[&](auto error) {
@@ -64,7 +64,7 @@ namespace class_file::descriptor::method {
 			while(*i != ')') {
 				Iterator begin = i;
 				bool error_happened = false;
-				read_type(
+				read_type_descriptor(
 					i,
 					[](auto){},
 					[&](auto error) {
@@ -121,7 +121,7 @@ namespace class_file::descriptor::method {
 		requires(Stage == reader_stage::ret) {
 			Iterator i = iterator_;
 			bool error_happened = false;
-			read_type(
+			read_type_descriptor(
 				i,
 				handler,
 				[&](auto error) { error_happened = true; error_handler(error); }

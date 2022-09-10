@@ -5,14 +5,14 @@
 #include <iterator_and_sentinel.hpp>
 #include <on_scope_exit.hpp>
 
-namespace class_file::descriptor {
+namespace class_file {
 
-	enum class type_read_error {
+	enum class type_descriptor_read_error {
 		unknown_type
 	};
 
 	template<basic_iterator Iterator, typename Handler, typename ErrorHandler>
-	void constexpr read_type(
+	void constexpr read_type_descriptor(
 		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler
 	) {
 		using iterator_type = remove_reference<Iterator>;
@@ -23,34 +23,37 @@ namespace class_file::descriptor {
 			uint8 c = *iterator;
 			++iterator;
 			switch (c) {
-			case 'V': handler(descriptor::v{}); return;
-			case 'B': handler(descriptor::b{}); return;
-			case 'C': handler(descriptor::c{}); return;
-			case 'D': handler(descriptor::d{}); return;
-			case 'F': handler(descriptor::f{}); return;
-			case 'I': handler(descriptor::i{}); return;
-			case 'J': handler(descriptor::j{}); return;
-			case 'S': handler(descriptor::s{}); return;
-			case 'Z': handler(descriptor::z{}); return;
-			case 'L': {
-				iterator_type class_name_begining = iterator;
-				while(*iterator != ';') {
-					++iterator;
-				}
-				iterator_type class_name_ending = iterator;
-				handler(descriptor::object {
-					.class_name {
-						(const char*) class_name_begining,
-						(uint16) iterator_and_sentinel {
-							class_name_begining,
-							class_name_ending
-						}.get_or_compute_distance()
+				case 'V': handler(class_file::v{}); return;
+				case 'B': handler(class_file::b{}); return;
+				case 'C': handler(class_file::c{}); return;
+				case 'D': handler(class_file::d{}); return;
+				case 'F': handler(class_file::f{}); return;
+				case 'I': handler(class_file::i{}); return;
+				case 'J': handler(class_file::j{}); return;
+				case 'S': handler(class_file::s{}); return;
+				case 'Z': handler(class_file::z{}); return;
+				case 'L': {
+					iterator_type class_name_begining = iterator;
+					while(*iterator != ';') {
+						++iterator;
 					}
-				});
-				++iterator; // skip ;
-				return;
-			}
-			default: error_handler(type_read_error::unknown_type); return;
+					iterator_type class_name_ending = iterator;
+					handler(object {
+						.class_name {
+							(const char*) class_name_begining,
+							(uint16) iterator_and_sentinel {
+								class_name_begining,
+								class_name_ending
+							}.get_or_compute_distance()
+						}
+					});
+					++iterator; // skip ;
+					return;
+				}
+				default: {
+					error_handler(type_descriptor_read_error::unknown_type);
+					return;
+				}
 			}
 		};
 
@@ -73,7 +76,7 @@ namespace class_file::descriptor {
 			}
 
 			iterator_type component_name_ending = iterator;
-			handler(descriptor::array {
+			handler(class_file::array {
 				.component {
 					(const char*) component_name_begining,
 					(uint16) iterator_and_sentinel {

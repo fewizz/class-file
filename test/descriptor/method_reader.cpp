@@ -4,12 +4,12 @@
 
 // optional isn't constexpr yet.
 int main() {
-	using namespace class_file::descriptor;
+	using namespace class_file;
 
 	nuint param = 0;
 	int last_result = 0;
 
-	method::try_read_parameter_types(
+	method_descriptor::try_read_parameter_types(
 		c_string{ "(IF[[[[I)V" }.iterator(),
 		[&]<typename Type>(Type type) {
 			if constexpr(same_as<Type, i>) {
@@ -18,10 +18,9 @@ int main() {
 			else if constexpr(same_as<Type, f>) {
 				if(param++ != 1) { last_result = 2; }
 			}
-			else if constexpr(same_as<Type, class_file::descriptor::array>) {
+			else if constexpr(same_as<Type, class_file::array>) {
 				if(param++ != 2) { last_result = 3; }
-				if(
-					!type.component.have_elements_equal_to(c_string{ "I" }) ||
+				if(!type.component.have_elements_equal_to(c_string{ "I" }) ||
 					type.rank != 4
 				) {
 					last_result = 4;
@@ -36,7 +35,7 @@ int main() {
 
 	if(last_result > 0) return last_result;
 
-	method::try_read_return_type(
+	method_descriptor::try_read_return_type(
 		c_string{ "(IF[J)D" }.iterator(),
 		[&]<typename Type>(Type) {
 			if constexpr(!same_as<Type, d>) {
@@ -47,15 +46,15 @@ int main() {
 	);
 
 	if(last_result > 0) return last_result;
-	method::try_read_parameter_and_return_types(
+	method_descriptor::try_read_parameter_and_return_types(
 		c_string{ "(Lsmth;)[I" }.iterator(),
 		[&]<typename ParamType>(ParamType) {
-			if constexpr(!same_as<ParamType, class_file::descriptor::object>) {
+			if constexpr(!same_as<ParamType, class_file::object>) {
 				last_result = 20;
 			}
 		},
 		[&]<typename RetType>(RetType) {
-			if constexpr(!same_as<RetType, class_file::descriptor::array>) {
+			if constexpr(!same_as<RetType, class_file::array>) {
 				last_result = 21;
 			}
 		},
