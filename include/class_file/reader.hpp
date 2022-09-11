@@ -87,7 +87,7 @@ namespace class_file {
 		requires (Stage == reader_stage::access_flags) {
 			Iterator i = iterator_;
 			class_file::access_flags flags {
-				read<access_flags, endianness::big>(i)
+				read<access_flag, endianness::big>(i)
 			};
 			return { flags, { i } };
 		}

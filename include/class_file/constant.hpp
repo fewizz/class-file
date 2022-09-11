@@ -54,15 +54,15 @@ namespace class_file::constant {
 		using index::index;
 	};
 
-	class name_and_type_index : public index{
+	class name_and_type_index : public index {
 		using index::index;
 	};
 
-	class method_handle_index : public index{
+	class method_handle_index : public index {
 		using index::index;
 	};
 
-	class invoke_dynamic_index : public index{
+	class invoke_dynamic_index : public index {
 		using index::index;
 	};
 

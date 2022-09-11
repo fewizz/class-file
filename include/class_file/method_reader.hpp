@@ -31,7 +31,7 @@ namespace class_file::method {
 		requires (Stage == reader_stage::access_flags) {
 			Iterator i = iterator_;
 			access_flag flags {
-				::read<access_flags, endianness::big>(i)
+				::read<access_flag, endianness::big>(i)
 			};
 			return { flags, { i } };
 		}

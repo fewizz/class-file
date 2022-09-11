@@ -1,6 +1,7 @@
 #pragma once
 
 #include <enum_flags.hpp>
+#include <bit_cast.hpp>
 
 namespace class_file {
 
@@ -40,6 +41,14 @@ namespace class_file {
 		bool annotation:1;
 		bool _enum     :1;
 		bool _module   :1;
+
+		access_flags(access_flag flag) {
+			((access_flag&)*this) = flag; // ugh
+		}
+
+		operator uint16() const {
+			return (uint16&) *this;
+		}
 	};
 
 	static_assert(sizeof(access_flags) == 2);

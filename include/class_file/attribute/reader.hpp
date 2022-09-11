@@ -32,10 +32,12 @@ namespace class_file::attribute {
 			uint32 length = read<uint32, endianness::big>(i);
 			constant::utf8 name = mapper(name_index);
 
-			if(name.equals_to(c_string{ "Code" })) {
+			if(name.have_elements_equal_to(c_string{ "Code" })) {
 				handler(code::reader{ i });
 			}
-			else if(name.equals_to(c_string{ "BootstrapMethods" })) {
+			else if(
+				name.have_elements_equal_to(c_string{ "BootstrapMethods" })
+			) {
 				handler(bootstrap_methods::reader{ i });
 			}
 
