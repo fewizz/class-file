@@ -398,20 +398,20 @@ namespace class_file::attribute::code::instruction {
 
 	struct if_null {
 		static constexpr uint8 code = 198;
-		uint16 branch;
+		int16 branch;
 	};
 	struct if_non_null {
 		static constexpr uint8 code = 199;
-		uint16 branch;
+		int16 branch;
 	};
 
 	struct goto_w {
 		static constexpr uint8 code = 200;
-		uint32 branch;
+		int32 branch;
 	};
 	struct jmp_sr_w {
 		static constexpr uint8 code = 200;
-		uint32 branch;
+		int32 branch;
 	};
 
 } // instruction

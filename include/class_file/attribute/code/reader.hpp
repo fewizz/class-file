@@ -550,19 +550,19 @@ namespace class_file::attribute::code {
 						); break;
 					}
 					case 198: {
-						uint16 branch = read<uint16, endianness::big>(i);
+						int16 branch = read<int16, endianness::big>(i);
 						action = handler(if_null{ branch }, i); break;
 					}
 					case 199: {
-						uint16 branch = read<uint16, endianness::big>(i);
+						int16 branch = read<int16, endianness::big>(i);
 						action = handler(if_non_null{ branch }, i); break;
 					}
 					case 200: {
-						uint32 branch = read<uint32, endianness::big>(i);
+						int32 branch = read<int32, endianness::big>(i);
 						action = handler(goto_w{ branch }, i); break;
 					}
 					case 201: {
-						uint16 branch = read<uint32, endianness::big>(i);
+						int16 branch = read<int32, endianness::big>(i);
 						action = handler(jmp_sr_w{ branch }, i); break;
 					}
 
