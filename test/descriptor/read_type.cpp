@@ -25,10 +25,14 @@ bool consteval desc_type() {
 			c_string{ "[F" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(same_as<Type, class_file::array>) {
-					if(!type.component.have_elements_equal_to(c_string{"F"})) {
-						throw;
-					}
-				} else { throw; }
+					if(type.rank != 1) { throw; }
+					if(type.size() != 2) { throw; }
+					if(type.component().size() == 0) { throw; }
+					if(
+						!type.component().have_elements_equal_to(c_string{"F"})
+					) { throw; }
+				}
+				else { throw; }
 			},
 			throw_on_error
 		);
@@ -38,7 +42,7 @@ bool consteval desc_type() {
 			c_string{ "Ljava/lang/String;" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(types_are_same<Type, object>) {
-					if(!type.class_name.have_elements_equal_to(
+					if(!type.have_elements_equal_to(
 						c_string{ "java/lang/String" }
 					)) { throw; }
 				}
@@ -52,7 +56,7 @@ bool consteval desc_type() {
 			c_string{ "[[[[Ljava/lang/String;" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(same_as<Type, class_file::array>) {
-					if(!type.component.have_elements_equal_to(
+					if(!type.component().have_elements_equal_to(
 						c_string{ "Ljava/lang/String;" }
 					)) { throw; }
 					if(type.rank != 4) { throw; }

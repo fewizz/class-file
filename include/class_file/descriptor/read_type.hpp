@@ -39,13 +39,11 @@ namespace class_file {
 					}
 					iterator_type class_name_ending = iterator;
 					handler(object {
-						.class_name {
-							(const char*) class_name_begining,
-							(uint16) iterator_and_sentinel {
-								class_name_begining,
-								class_name_ending
-							}.get_or_compute_distance()
-						}
+						(const char*) class_name_begining,
+						(uint16) iterator_and_sentinel {
+							class_name_begining,
+							class_name_ending
+						}.get_or_compute_distance()
 					});
 					++iterator; // skip ;
 					return;
@@ -58,13 +56,13 @@ namespace class_file {
 		};
 
 		if(*iterator == '[') {
+			iterator_type begining = iterator;
 			++iterator;
 			uint8 rank = 1;
 			while(*iterator == '[') {
 				++rank;
 				++iterator;
 			}
-			iterator_type component_name_begining = iterator;
 			bool error_happened = false;
 			read_without_array(
 				iterator,
@@ -75,15 +73,15 @@ namespace class_file {
 				return;
 			}
 
-			iterator_type component_name_ending = iterator;
+			iterator_type ending = iterator;
 			handler(class_file::array {
-				.component {
-					(const char*) component_name_begining,
+				span {
+					(const char*) begining,
 					(uint16) iterator_and_sentinel {
-						component_name_begining, component_name_ending
+						begining, ending
 					}.get_or_compute_distance()
 				},
-				.rank = rank
+				rank
 			});
 		}
 		else {
