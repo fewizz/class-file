@@ -13,7 +13,6 @@ namespace class_file::attribute::code {
 	enum class reader_stage {
 		max_stack,
 		max_locals,
-		code_length,
 		code,
 		exception_table,
 		attributes
@@ -28,68 +27,65 @@ namespace class_file::attribute::code {
 
 		reader(Iterator it) : iterator_{ it } {}
 
-		tuple<reader<Iterator, reader_stage::max_locals>, uint16>
-		operator () () const
+		Iterator iterator_copy() const { return iterator_; }
+
+		tuple<uint16, reader<Iterator, reader_stage::max_locals>>
+		read_and_get_max_locals_reader() const
 		requires (Stage == reader_stage::max_stack) {
 			Iterator i = iterator_;
 			uint16 max_stack = read<uint16, endianness::big>(i);
-			return { { i }, { max_stack } };
+			return { { max_stack }, { i } };
 		}
 
-		tuple<reader<Iterator, reader_stage::code_length>, uint16>
-		operator () () const
+		tuple<uint16, reader<Iterator, reader_stage::code>>
+		read_and_get_code_reader() const
 		requires (Stage == reader_stage::max_locals) {
 			Iterator i = iterator_;
 			uint16 max_locals = read<uint16, endianness::big>(i);
-			return { { i }, { max_locals } };
+			return { { max_locals }, { i } };
 		}
 
 		reader<Iterator, reader_stage::exception_table>
-		skip () const
-		requires (Stage == reader_stage::code_length) {
-			Iterator i = iterator_;
-			uint32 length = read<uint32, endianness::big>(i);
-			Iterator end = iterator_ + length;
-			return { end };
-		}
-
-		tuple<
-			reader<Iterator, reader_stage::exception_table>,
-			span<uint8, uint32>
-		>
-		as_span () const
-		requires (Stage == reader_stage::code_length) {
+		skip_and_get_exception_table_reader() const
+		requires (Stage == reader_stage::code) {
 			Iterator i = iterator_;
 			uint32 length = read<uint32, endianness::big>(i);
 			Iterator end = i + length;
-			return {
-				{ end },
-				{ (uint8*) i, length }
-			};
+			return { end };
+		}
+
+		auto read_as_span() const
+		requires (Stage == reader_stage::code) {
+			Iterator i = iterator_;
+			uint32 length = read<uint32, endianness::big>(i);
+			return span{ i, length };
 		}
 
 		template<typename Handler>
 		reader<Iterator, reader_stage::exception_table>
-		operator () (Handler&& handler) const
-		requires (Stage == reader_stage::code_length) {
+		read_and_get_exception_table_reader(Handler&& handler) const
+		requires (Stage == reader_stage::code) {
 			Iterator i = iterator_;
 			uint32 length = read<uint32, endianness::big>(i);
-			return reader<Iterator, reader_stage::code>{ i }(
+			return read_and_get_exception_table_reader(
 				forward<Handler>(handler), length
 			);
 		}
 
 		template<typename Handler>
 		reader<Iterator, reader_stage::exception_table>
-		operator () (Handler&& handler, uint32 length) const
+		read_and_get_exception_table_reader(
+			Handler&& handler, uint32 length
+		) const
 		requires (Stage == reader_stage::code) {
+			Iterator i = iterator_;
+			read<uint32, endianness::big>(i); // skip length, already provided
+			Iterator end = i + length;
+			Iterator begin = i;
+
 			using namespace instruction;
 
-			Iterator i = iterator_;
-			Iterator end = iterator_ + length;
-			Iterator src0 = iterator_;
-
-			while(i - src0 < length) {
+			while(i - begin < length) {
 				uint8 instruction_code = read<uint8>(i);
 
 				loop_action action;
@@ -376,7 +372,7 @@ namespace class_file::attribute::code {
 						action = handler(return_sr{ index }, i); break;
 					}
 					case 170: {
-						while((i - src0) % 4 != 0) {
+						while((i - begin) % 4 != 0) {
 							++i;
 						}
 						int32 _default = read<int32, endianness::big>(i);
@@ -399,7 +395,7 @@ namespace class_file::attribute::code {
 						); break;
 					}
 					case 171: {
-						while((i - src0) % 4 != 0) {
+						while((i - begin) % 4 != 0) {
 							++i;
 						}
 						int32 _default = read<int32, endianness::big>(i);
@@ -578,27 +574,27 @@ namespace class_file::attribute::code {
 			return { end };
 		}
 
-		uint16 count() const
+		uint16 read_count() const
 		requires (Stage == reader_stage::exception_table) {
-			Iterator cpy = iterator_;
-			uint16 length = read<uint16, endianness::big>(cpy);
-			return length;
+			Iterator i = iterator_;
+			uint16 count = read<uint16, endianness::big>(i);
+			return count;
 		}
 
 		template<typename Handler>
 		reader<Iterator, reader_stage::attributes>
-		operator () (Handler&& handler) const
+		read_and_get_attributes_reader(Handler&& handler) const
 		requires (Stage == reader_stage::exception_table) {
-			Iterator cpy = iterator_;
-			uint16 length = read<uint16, endianness::big>(cpy);
-			Iterator end = cpy + sizeof(uint16) * length * 4;
+			Iterator i = iterator_;
+			uint16 count = read<uint16, endianness::big>(i);
+			Iterator end = i + sizeof(uint16) * count * 4;
 
-			while(length > 0) {
-				uint16 start_pc = read<uint16, endianness::big>(cpy);
-				uint16 end_pc = read<uint16, endianness::big>(cpy);
-				uint16 handler_pc = read<uint16, endianness::big>(cpy);
+			while(count > 0) {
+				uint16 start_pc = read<uint16, endianness::big>(i);
+				uint16 end_pc = read<uint16, endianness::big>(i);
+				uint16 handler_pc = read<uint16, endianness::big>(i);
 				constant::class_index catch_type {
-					read<uint16, endianness::big>(cpy)
+					read<uint16, endianness::big>(i)
 				};
 
 				loop_action action = handler(exception_handler {
@@ -612,7 +608,7 @@ namespace class_file::attribute::code {
 					case loop_action::stop: return { end };
 				}
 
-				--length;
+				--count;
 			}
 
 			return { end };

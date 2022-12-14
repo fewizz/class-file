@@ -29,7 +29,7 @@ namespace class_file {
 		reader(Iterator it) : iterator_{ it } {}
 
 		tuple<bool, reader<Iterator, reader_stage::version>>
-		check_for_magic_and_get_version_reader() const
+		read_and_check_and_get_version_reader() const
 		requires (Stage == reader_stage::magic) {
 			Iterator i = iterator_;
 			uint32 val = read<uint32, endianness::big>(i);
@@ -71,7 +71,7 @@ namespace class_file {
 		}
 
 
-		uint16 entries_count() const
+		uint16 read_count() const
 		requires (Stage == reader_stage::constant_pool) {
 			uint16 constant_pool_size = 0;
 			read_and_get_access_flags_reader(
@@ -116,7 +116,7 @@ namespace class_file {
 			return { super_class_index, { i } };
 		}
 
-		uint16 count() const
+		uint16 read_count() const
 		requires (Stage == reader_stage::interfaces) {
 			Iterator i = iterator_;
 			return read<uint16, endianness::big>(i);
@@ -137,7 +137,7 @@ namespace class_file {
 			return { i };
 		}
 
-		uint16 count () const
+		uint16 read_count () const
 		requires (Stage == reader_stage::fields) {
 			Iterator i = iterator_;
 			return read<uint16, endianness::big>(i);
@@ -157,7 +157,7 @@ namespace class_file {
 			return { i };
 		}
 
-		uint16 count () const
+		uint16 read_count () const
 		requires (Stage == reader_stage::methods) {
 			Iterator i = iterator_;
 			return read<uint16, endianness::big>(i);

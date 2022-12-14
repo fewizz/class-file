@@ -22,7 +22,7 @@ namespace class_file::method {
 
 		reader(Iterator it) : iterator_{ it } {}
 
-		Iterator iterator_copy() {
+		Iterator iterator_copy() const {
 			return iterator_;
 		}
 
