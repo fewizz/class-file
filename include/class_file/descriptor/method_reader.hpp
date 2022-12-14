@@ -154,10 +154,10 @@ namespace class_file::method_descriptor {
 		reader r{ iterator };
 		auto possible_return_type_reader
 			= r.try_skip_parameters_and_get_return_type_reader(error_handler);
-		if(!possible_return_type_reader.has_value()) {
+		if(possible_return_type_reader.has_no_value()) {
 			return;
 		}
-		possible_return_type_reader.value()
+		possible_return_type_reader.get()
 			.try_read_and_get_advanced_iterator(handler, error_handler);
 	}
 
@@ -179,10 +179,10 @@ namespace class_file::method_descriptor {
 				parameter_types_handler,
 				error_handler
 			);
-		if(!possible_return_type_reader.has_value()) {
+		if(possible_return_type_reader.has_no_value()) {
 			return;
 		}
-		possible_return_type_reader.value()
+		possible_return_type_reader.get()
 			.try_read_and_get_advanced_iterator(
 				return_type_handler, error_handler
 			);

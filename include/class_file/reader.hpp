@@ -43,9 +43,9 @@ namespace class_file {
 		read_and_get_constant_pool_reader() const
 		requires (Stage == reader_stage::version) {
 			Iterator i = iterator_;
-			uint16 min = read<uint16, endianness::big>(i);
-			uint16 maj = read<uint16, endianness::big>(i);
-			return { { min, maj }, { i } };
+			uint16 minor = read<uint16, endianness::big>(i);
+			uint16 major = read<uint16, endianness::big>(i);
+			return { { minor, major }, { i } };
 		}
 
 		template<typename Handler>

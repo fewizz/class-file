@@ -43,7 +43,7 @@ namespace class_file {
 		bool _module   :1;
 
 		access_flags(access_flag flag) {
-			((access_flag&)*this) = flag; // ugh
+			((access_flag&) *this) = flag; // ugh
 		}
 
 		operator uint16() const {
@@ -51,6 +51,6 @@ namespace class_file {
 		}
 	};
 
-	static_assert(sizeof(access_flags) == 2);
+	static_assert(bits_in<access_flags> == 16);
 
 }
