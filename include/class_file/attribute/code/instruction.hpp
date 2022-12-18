@@ -405,7 +405,7 @@ namespace class_file::attribute::code::instruction {
 		int16 branch;
 	};
 
-	struct goto_w {
+	struct go_to_w {
 		static constexpr uint8 code = 200;
 		int32 branch;
 	};

@@ -555,7 +555,7 @@ namespace class_file::attribute::code {
 					}
 					case 200: {
 						int32 branch = read<int32, endianness::big>(i);
-						action = handler(goto_w{ branch }, i); break;
+						action = handler(go_to_w{ branch }, i); break;
 					}
 					case 201: {
 						int16 branch = read<int32, endianness::big>(i);
