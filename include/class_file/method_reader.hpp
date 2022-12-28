@@ -73,9 +73,7 @@ namespace class_file::method {
 				--count;
 				i = attribute::reader{ i }.read_and_get_advanced_iterator(
 					forward<Mapper>(mapper),
-					[&](auto attribute_reader) {
-						handler(attribute_reader);
-					}
+					handler
 				);
 			}
 			return i;

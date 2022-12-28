@@ -11,7 +11,7 @@ namespace class_file {
 		_protected = 0x0004,
 		_static    = 0x0008,
 		_final     = 0x0010,
-		super      = 0x0020,
+		super      = 0x0020, synchronized = 0x0020,
 		bridge     = 0x0040,
 		varargs    = 0x0080,
 		native     = 0x0100,
@@ -30,7 +30,7 @@ namespace class_file {
 		bool _protected:1;
 		bool _static   :1;
 		bool _final    :1;
-		bool super     :1;
+		bool super_or_synchronized:1;
 		bool bridge    :1;
 		bool varargs   :1;
 		bool native    :1;

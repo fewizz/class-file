@@ -2,7 +2,8 @@
 
 #include "instruction.hpp"
 #include "exception_handler.hpp"
-#include "../type.hpp"
+#include "../../attribute/type.hpp"
+#include "../../attribute/__reader/reader.hpp"
 
 #include <loop_action.hpp>
 #include <tuple.hpp>
@@ -20,7 +21,7 @@ namespace class_file::attribute::code {
 
 	template<typename Iterator, reader_stage Stage = reader_stage::max_stack>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		static constexpr attribute::type attribute_type = type::code;
@@ -612,6 +613,24 @@ namespace class_file::attribute::code {
 			}
 
 			return { end };
+		}
+
+		template<typename Mapper, typename Handler>
+		Iterator read_and_get_advanced_iterator(
+			Mapper&& mapper, Handler&& handler
+		) const
+		requires (Stage == reader_stage::attributes) {
+			Iterator i = iterator_;
+			uint16 count{ ::read<uint16, endianness::big>(i) };
+			while(count > 0) {
+				--count;
+				i = attribute::reader{ i }
+				.read_and_get_advanced_iterator(
+					forward<Mapper>(mapper),
+					handler
+				);
+			}
+			return i;
 		}
 
 	};

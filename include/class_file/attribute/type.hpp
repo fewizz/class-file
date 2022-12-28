@@ -4,7 +4,9 @@ namespace class_file::attribute {
 
 	enum class type {
 		code,
-		bootstrap_methods
+		bootstrap_methods,
+		line_numbers,
+		source_file
 	};
 
 }

@@ -294,7 +294,7 @@ namespace class_file::attribute::code::instruction {
 		int32 hight;
 		span<int32, uint32> offsets;
 	};
-	struct match_offset{ int32 match; int32 offset; };
+	struct match_offset { int32 match; int32 offset; };
 	struct lookup_switch {
 		static constexpr uint8 code = 171;
 		int32 _default;
