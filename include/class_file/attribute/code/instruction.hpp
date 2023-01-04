@@ -6,6 +6,8 @@
 
 namespace class_file::attribute::code::instruction {
 
+	struct unknown { uint8 code = 255; };
+
 	struct nop { static constexpr uint8 code = 0; };
 
 	struct a_const_null { static constexpr uint8 code = 1; };
