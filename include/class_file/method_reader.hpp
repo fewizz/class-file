@@ -83,7 +83,7 @@ namespace class_file::method {
 
 	};
 
-	template<typename Iterator>
+	template<basic_iterator Iterator>
 	reader(Iterator) -> reader<Iterator>;
 
 }

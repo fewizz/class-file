@@ -7,9 +7,9 @@
 
 namespace class_file::constant {
 
-	template<typename Iterator>
+	template<basic_iterator Iterator>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		reader(Iterator it) : iterator_{ it } {}

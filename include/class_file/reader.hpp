@@ -19,7 +19,7 @@ namespace class_file {
 		interfaces, fields, methods, attributes
 	};
 
-	template<typename Iterator, reader_stage Stage = reader_stage::magic>
+	template<basic_iterator Iterator, reader_stage Stage = reader_stage::magic>
 	class reader {
 		const Iterator iterator_;
 	public:

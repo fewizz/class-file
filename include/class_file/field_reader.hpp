@@ -85,7 +85,7 @@ namespace class_file::field {
 
 	};
 
-	template<typename Iterator>
+	template<basic_iterator Iterator>
 	reader(Iterator) -> reader<Iterator>;
 
 }

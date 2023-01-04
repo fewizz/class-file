@@ -15,10 +15,10 @@ namespace class_file::attribute::bootstrap::method {
 	};
 
 	template<
-		typename Iterator, reader_stage Stage = reader_stage::reference_index
+		basic_iterator Iterator, reader_stage Stage = reader_stage::reference_index
 	>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		reader(Iterator it) : iterator_{ it } {}

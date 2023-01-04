@@ -141,7 +141,7 @@ namespace class_file::attribute::code {
 
 	};
 
-	template<typename Iterator>
+	template<basic_iterator Iterator>
 	reader(Iterator) -> reader<Iterator>;
 
 }
