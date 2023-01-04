@@ -27,7 +27,7 @@ namespace class_file::line_numbers {
 
 	template<basic_iterator Iterator, reader_stage Stage = reader_stage::count>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		static constexpr attribute::type attribute_type

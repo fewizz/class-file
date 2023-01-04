@@ -20,7 +20,9 @@ namespace class_file::attribute::code {
 		attributes
 	};
 
-	template<typename Iterator, reader_stage Stage = reader_stage::max_stack>
+	template<
+		basic_iterator Iterator, reader_stage Stage = reader_stage::max_stack
+	>
 	class reader {
 		const Iterator iterator_;
 	public:

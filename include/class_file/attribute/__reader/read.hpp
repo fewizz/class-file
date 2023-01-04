@@ -7,7 +7,7 @@
 #include "./../line_numbers/reader.hpp"
 #include "./../source_file/reader.hpp"
 
-template<typename Iterator>
+template<basic_iterator Iterator>
 template<
 	typename IndexToUtf8Mapper,
 	typename Handler

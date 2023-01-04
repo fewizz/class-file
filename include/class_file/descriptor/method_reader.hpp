@@ -19,7 +19,7 @@ namespace class_file::method_descriptor {
 		reader_stage Stage = reader_stage::parameters
 	>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		constexpr reader(Iterator iterator) : iterator_{ iterator } {}
@@ -37,7 +37,7 @@ namespace class_file::method_descriptor {
 			++i;
 			while(*i != ')') {
 				bool error_happened = false;
-				read_type_descriptor(
+				read_parameter_type_descriptor(
 					i,
 					handler,
 					[&](auto error) {
@@ -64,7 +64,7 @@ namespace class_file::method_descriptor {
 			while(*i != ')') {
 				Iterator begin = i;
 				bool error_happened = false;
-				read_type_descriptor(
+				read_parameter_type_descriptor(
 					i,
 					[](auto){},
 					[&](auto error) {
@@ -121,7 +121,7 @@ namespace class_file::method_descriptor {
 		requires(Stage == reader_stage::ret) {
 			Iterator i = iterator_;
 			bool error_happened = false;
-			read_type_descriptor(
+			read_return_type_descriptor(
 				i,
 				handler,
 				[&](auto error) { error_happened = true; error_handler(error); }

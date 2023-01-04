@@ -14,9 +14,9 @@ namespace class_file::attribute::bootstrap_methods {
 		methods
 	};
 
-	template<typename Iterator, reader_stage Stage = reader_stage::count>
+	template<basic_iterator Iterator, reader_stage Stage = reader_stage::count>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		reader(Iterator it) : iterator_{ it } {}

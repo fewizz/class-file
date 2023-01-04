@@ -15,9 +15,11 @@ namespace class_file::method {
 		attributes
 	};
 
-	template<typename Iterator, reader_stage Stage = reader_stage::access_flags>
+	template<
+		basic_iterator Iterator, reader_stage Stage = reader_stage::access_flags
+	>
 	class reader {
-		Iterator iterator_;
+		const Iterator iterator_;
 	public:
 
 		reader(Iterator it) : iterator_{ it } {}

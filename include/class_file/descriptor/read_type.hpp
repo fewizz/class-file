@@ -11,7 +11,12 @@ namespace class_file {
 		unknown_type
 	};
 
-	template<basic_iterator Iterator, typename Handler, typename ErrorHandler>
+	template<
+		bool possibly_void,
+		basic_iterator Iterator,
+		typename Handler,
+		typename ErrorHandler
+	>
 	void constexpr read_type_descriptor(
 		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler
 	) {
@@ -23,7 +28,11 @@ namespace class_file {
 			uint8 c = *iterator;
 			++iterator;
 			switch (c) {
-				case 'V': handler(class_file::v{}); return;
+				case 'V': {
+					if constexpr(possibly_void) {
+						handler(class_file::v{}); return;
+					}
+				}
 				case 'B': handler(class_file::b{}); return;
 				case 'C': handler(class_file::c{}); return;
 				case 'D': handler(class_file::d{}); return;
@@ -91,6 +100,39 @@ namespace class_file {
 				forward<ErrorHandler>(error_handler)
 			);
 		}
+	}
+
+	template<basic_iterator Iterator, typename Handler, typename ErrorHandler>
+	void constexpr read_parameter_type_descriptor(
+		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler
+	) {
+		return read_type_descriptor<false>(
+			forward<Iterator>(iterator),
+			forward<Handler>(handler),
+			forward<ErrorHandler>(error_handler)
+		);
+	}
+
+	template<basic_iterator Iterator, typename Handler, typename ErrorHandler>
+	void constexpr read_field_type_descriptor(
+		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler
+	) {
+		return read_type_descriptor<false>(
+			forward<Iterator>(iterator),
+			forward<Handler>(handler),
+			forward<ErrorHandler>(error_handler)
+		);
+	}
+
+	template<basic_iterator Iterator, typename Handler, typename ErrorHandler>
+	void constexpr read_return_type_descriptor(
+		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler
+	) {
+		return read_type_descriptor<true>(
+			forward<Iterator>(iterator),
+			forward<Handler>(handler),
+			forward<ErrorHandler>(error_handler)
+		);
 	}
 
 }
