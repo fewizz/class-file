@@ -24,16 +24,16 @@ class_file::attribute::reader<Iterator>::read_and_get_advanced_iterator(
 	constant::utf8 name = mapper(name_index);
 
 	if(
-		name.have_elements_equal_to(c_string{ "Code" })
+		name.has_equal_size_and_elements(c_string{ "Code" })
 	) { handler(code::reader{ i }); }
 	else if(
-		name.have_elements_equal_to(c_string{ "BootstrapMethods" })
+		name.has_equal_size_and_elements(c_string{ "BootstrapMethods" })
 	) { handler(bootstrap_methods::reader{ i }); }
 	else if(
-		name.have_elements_equal_to(c_string{ "LineNumberTable" })
+		name.has_equal_size_and_elements(c_string{ "LineNumberTable" })
 	) { handler(line_numbers::reader{ i }); }
 	else if(
-		name.have_elements_equal_to(c_string{ "SourceFile" })
+		name.has_equal_size_and_elements(c_string{ "SourceFile" })
 	) { handler(source_file::reader{ i }); }
 
 	i += length;

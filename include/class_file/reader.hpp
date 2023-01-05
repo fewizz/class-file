@@ -195,7 +195,7 @@ namespace class_file {
 
 	};
 
-	template<typename Iterator, reader_stage Stage = reader_stage::magic>
+	template<basic_iterator Iterator, reader_stage Stage = reader_stage::magic>
 	reader(Iterator) -> reader<Iterator, Stage>;
 
 }
