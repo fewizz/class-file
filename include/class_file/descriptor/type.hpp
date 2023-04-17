@@ -35,4 +35,13 @@ namespace class_file {
 		};
 	};
 
+	template<typename Type>
+	concept descriptor_type =
+		same_as<Type, v> ||
+		same_as<Type, b> || same_as<Type, c> ||
+		same_as<Type, d> || same_as<Type, f> ||
+		same_as<Type, i> || same_as<Type, j> ||
+		same_as<Type, s> || same_as<Type, z> ||
+		same_as<Type, object> || same_as<Type, array>;
+
 }

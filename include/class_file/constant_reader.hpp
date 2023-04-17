@@ -83,7 +83,7 @@ namespace class_file::constant {
 					break;
 				}
 				case interface_method_ref::tag : {
-					interface_index class_index {
+					class_index class_index {
 						read<uint16, endianness::big>(i)
 					};
 					name_and_type_index nat_index {

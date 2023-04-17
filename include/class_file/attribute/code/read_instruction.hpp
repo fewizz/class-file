@@ -373,13 +373,13 @@ namespace class_file::attribute::code::instruction {
 				return handler(invoke_virtual{ index });
 			}
 			case 183: {
-				constant::method_ref_index index {
+				constant::method_or_interface_method_ref_index index {
 					::read<uint16, endianness::big>(i)
 				};
 				return handler(invoke_special{ index });
 			}
 			case 184: {
-				constant::method_ref_index index {
+				constant::method_or_interface_method_ref_index index {
 					::read<uint16, endianness::big>(i)
 				};
 				return handler(invoke_static{ index });

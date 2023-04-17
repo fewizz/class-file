@@ -127,7 +127,7 @@ namespace class_file {
 			Iterator i = iterator_;
 			uint16 count = read<uint16, endianness::big>(i);
 			for(uint16 x = 0; x < count; ++x) {
-				constant::interface_index index {
+				constant::class_index index {
 					read<uint16, endianness::big>(i)
 				};
 				handler(index);

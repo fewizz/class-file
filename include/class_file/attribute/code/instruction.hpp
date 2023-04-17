@@ -332,11 +332,11 @@ namespace class_file::attribute::code::instruction {
 	};
 	struct invoke_special {
 		static constexpr uint8 code = 183;
-		constant::method_ref_index index;
+		constant::method_or_interface_method_ref_index index;
 	};
 	struct invoke_static {
 		static constexpr uint8 code = 184;
-		constant::method_ref_index index;
+		constant::method_or_interface_method_ref_index index;
 	};
 	struct invoke_interface {
 		static constexpr uint8 code = 185;

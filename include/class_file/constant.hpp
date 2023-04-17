@@ -54,6 +54,19 @@ namespace class_file::constant {
 		using index::index;
 	};
 
+	class method_or_interface_method_ref_index : public index {
+		using index::index;
+
+	public:
+		method_ref_index as_method_ref_index() const {
+			return method_ref_index{ *this };
+		}
+
+		interface_method_ref_index as_interface_method_ref_index() const {
+			return interface_method_ref_index{ *this };
+		}
+	};
+
 	class name_and_type_index : public index {
 		using index::index;
 	};
@@ -72,10 +85,6 @@ namespace class_file::constant {
 
 	class descriptor_index : public utf8_index {
 		using utf8_index::utf8_index;
-	};
-
-	class interface_index : public class_index {
-		using class_index::class_index;
 	};
 
 	struct unknown {
@@ -136,7 +145,7 @@ namespace class_file::constant {
 
 	struct interface_method_ref {
 		static constexpr uint8 tag = 11;
-		interface_index interface_index;
+		class_index class_index;
 		name_and_type_index name_and_type_index;
 	};
 
