@@ -6,6 +6,7 @@
 -ftemplate-backtrace-limit=0
 -Iinclude
 -I../core/include
+-I../encoding/include
 -fmodules
--Xclang -fimplicit-module-maps
--Xclang -fprebuilt-module-path=./build
+-fimplicit-module-maps
+-fprebuilt-module-path=./build

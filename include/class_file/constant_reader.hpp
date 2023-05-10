@@ -5,6 +5,8 @@
 #include <integer.hpp>
 #include <read.hpp>
 
+#include <unicode/utf8.hpp>
+
 namespace class_file::constant {
 
 	template<basic_iterator Iterator>
@@ -22,7 +24,7 @@ namespace class_file::constant {
 			switch (tag) {
 				case utf8::tag : {
 					uint16 len = read<uint16, endianness::big>(i);
-					handler(utf8{ (char*) i, len });
+					handler(utf8{ (::utf8::unit*) i, len });
 					i += len;
 					break;
 				}

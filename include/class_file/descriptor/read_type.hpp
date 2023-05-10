@@ -48,7 +48,7 @@ namespace class_file {
 					}
 					iterator_type class_name_ending = iterator;
 					handler(object {
-						(const char*) class_name_begining,
+						(const utf8::unit*) class_name_begining,
 						(uint16) iterator_and_sentinel {
 							class_name_begining,
 							class_name_ending
@@ -85,7 +85,7 @@ namespace class_file {
 			iterator_type ending = iterator;
 			handler(class_file::array {
 				span {
-					(const char*) begining,
+					(const utf8::unit*) begining,
 					(uint16) iterator_and_sentinel {
 						begining, ending
 					}.get_or_compute_distance()
