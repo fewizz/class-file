@@ -5,8 +5,7 @@
 
 #include <iterator_and_sentinel.hpp>
 
-#include <tuple.hpp>
-#include <read.hpp>
+#include <write.hpp>
 
 namespace class_file::source_file {
 
@@ -20,13 +19,12 @@ namespace class_file::source_file {
 
 		reader(Iterator iterator) : iterator_{ iterator } {}
 
-		tuple<constant::utf8_index, Iterator>
-		read_index_and_get_advanced_iterator() {
+		Iterator write_index_and_get_advanced_iterator(
+			constant::utf8_index ci
+		) {
 			Iterator i = iterator_;
-			constant::utf8_index index {
-				::read<uint16, endianness::big>(i)
-			};
-			return { index, i };
+			::write<endianness::big, uint16>(ci, i);
+			return i;
 		}
 	};
 

@@ -7,44 +7,40 @@
 #include <iterator_and_sentinel.hpp>
 
 #include <tuple.hpp>
-#include <read.hpp>
+#include <write.hpp>
 
 namespace class_file::line_numbers {
 
 	template<basic_iterator Iterator, stage Stage = stage::count>
-	class reader {
+	class writer {
 		const Iterator iterator_;
 	public:
 
 		static constexpr attribute::type attribute_type
 			= attribute::type::line_numbers;
 
-		reader(Iterator iterator) : iterator_{ iterator } {}
+		writer(Iterator iterator) : iterator_{ iterator } {}
 
-		tuple<uint16, reader<Iterator, stage::line_numbers>>
-		read_count_and_get_line_numbers_reader()
+		writer<Iterator, stage::line_numbers>
+		write_count_and_get_line_numbers_writer(uint16 count)
 		requires (Stage == stage::count) {
 			Iterator i = iterator_;
-			uint16 count = ::read<uint16, endianness::big>(i);
-			return { count, { i } };
+			::write<endianness::big, uint16>(count, i);
+			return { i };
 		}
 
 		template<typename Handler>
 		requires (Stage == stage::line_numbers)
-		Iterator read_and_get_advanced_iterator(
-			uint16 count, Handler&& handler
+		Iterator write_and_get_advanced_iterator(
+			Handler&& handler
 		) {
 			Iterator i = iterator_;
-			while(count > 0) {
-				--count;
-				uint16 start_pc {
-					::read<uint16, endianness::big>(i)
-				};
-				class_file::line_number line_number {
-					::read<uint16, endianness::big>(i)
-				};
-				handler(start_pc, line_number);
-			}
+
+			handler([](uint16 start_pc, class_file::line_number line_number) {
+				::write<endianness::big>(start_pc, i);
+				::write<endianness::big>(line_number, i);
+			});
+
 			return i;
 		}
 

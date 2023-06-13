@@ -8,7 +8,9 @@ namespace class_file::attribute::code::instruction {
 
 	struct unknown { uint8 code = 255; };
 
-	struct nop { static constexpr uint8 code = 0; };
+	struct nop {
+		static constexpr uint8 code = 0;
+	};
 
 	struct a_const_null { static constexpr uint8 code = 1; };
 	struct i_const_m1   { static constexpr uint8 code = 2; };
@@ -293,7 +295,7 @@ namespace class_file::attribute::code::instruction {
 		static constexpr uint8 code = 170;
 		int32 _default;
 		int32 low;
-		int32 hight;
+		int32 high;
 		span<int32, uint32> offsets;
 	};
 	struct match_offset { int32 match; int32 offset; };

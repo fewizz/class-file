@@ -18,10 +18,11 @@ class_file::attribute::reader<Iterator>::read_and_get_advanced_iterator(
 ) const {
 	Iterator i = iterator_;
 	constant::name_index name_index {
-		read<uint16, endianness::big>(i)
+		::read<uint16, endianness::big>(i)
 	};
-	uint32 length = read<uint32, endianness::big>(i);
 	constant::utf8 name = mapper(name_index);
+
+	uint32 length = ::read<uint32, endianness::big>(i);
 
 	if(
 		name.has_equal_size_and_elements(c_string{ "Code" })

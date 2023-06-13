@@ -7,6 +7,7 @@
 -Iinclude
 -I../core/include
 -I../encoding/include
+-I../posix-wrapper/include
 -fmodules
 -fimplicit-module-maps
 -fprebuilt-module-path=./build

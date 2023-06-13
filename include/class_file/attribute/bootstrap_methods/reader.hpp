@@ -19,7 +19,7 @@ namespace class_file::attribute::bootstrap_methods {
 		const Iterator iterator_;
 	public:
 
-		reader(Iterator it) : iterator_{ it } {}
+		reader(Iterator iterator) : iterator_{ iterator } {}
 
 		static constexpr attribute::type attribute_type {
 			type::bootstrap_methods
@@ -55,4 +55,4 @@ namespace class_file::attribute::bootstrap_methods {
 
 	};
 
-} // bootstrap_methods
+}

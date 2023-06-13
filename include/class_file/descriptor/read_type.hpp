@@ -65,7 +65,7 @@ namespace class_file {
 		};
 
 		if(*iterator == '[') {
-			iterator_type begining = iterator;
+			iterator_type beginning = iterator;
 			++iterator;
 			uint8 rank = 1;
 			while(*iterator == '[') {
@@ -84,10 +84,10 @@ namespace class_file {
 
 			iterator_type ending = iterator;
 			handler(class_file::array {
-				span {
-					(const utf8::unit*) begining,
+				span<const utf8::unit> {
+					beginning,
 					(uint16) iterator_and_sentinel {
-						begining, ending
+						beginning, ending
 					}.get_or_compute_distance()
 				},
 				rank

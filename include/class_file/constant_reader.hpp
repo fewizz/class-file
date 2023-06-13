@@ -15,7 +15,7 @@ namespace class_file::constant {
 	public:
 
 		reader(Iterator it) : iterator_{ it } {}
-		
+
 		template<typename Handler>
 		Iterator read_and_get_advanced_iterator(Handler&& handler) {
 			Iterator i = iterator_;

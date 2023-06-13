@@ -10,8 +10,8 @@ bool consteval desc_type() {
 	auto throw_on_error = [](auto){ throw; };
 
 	{
-		read_type_descriptor(
-			c_string{ "I" }.iterator(),
+		read_type_descriptor<true>(
+			c_string{ u8"I" }.iterator(),
 			[]<typename Type>(Type) {
 				if constexpr(!types_are_same<Type, i>) {
 					throw;
@@ -21,15 +21,17 @@ bool consteval desc_type() {
 		);
 	}
 	{
-		read_type_descriptor(
-			c_string{ "[F" }.iterator(),
+		read_type_descriptor<true>(
+			c_string{ u8"[F" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(same_as<Type, class_file::array>) {
 					if(type.rank != 1) { throw; }
 					if(type.size() != 2) { throw; }
 					if(type.component().size() == 0) { throw; }
 					if(
-						!type.component().have_elements_equal_to(c_string{"F"})
+						!type.component().has_equal_size_and_elements(
+							c_string{ u8"F" }
+						)
 					) { throw; }
 				}
 				else { throw; }
@@ -38,12 +40,12 @@ bool consteval desc_type() {
 		);
 	}
 	{
-		read_type_descriptor(
-			c_string{ "Ljava/lang/String;" }.iterator(),
+		read_type_descriptor<true>(
+			c_string{ u8"Ljava/lang/String;" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(types_are_same<Type, object>) {
-					if(!type.have_elements_equal_to(
-						c_string{ "java/lang/String" }
+					if(!type.has_equal_size_and_elements(
+						c_string{ u8"java/lang/String" }
 					)) { throw; }
 				}
 				else { throw; }
@@ -52,12 +54,12 @@ bool consteval desc_type() {
 		);
 	}
 	{
-		read_type_descriptor(
-			c_string{ "[[[[Ljava/lang/String;" }.iterator(),
+		read_type_descriptor<true>(
+			c_string{ u8"[[[[Ljava/lang/String;" }.iterator(),
 			[]<typename Type>(Type type) {
 				if constexpr(same_as<Type, class_file::array>) {
-					if(!type.component().have_elements_equal_to(
-						c_string{ "Ljava/lang/String;" }
+					if(!type.component().has_equal_size_and_elements(
+						c_string{ u8"Ljava/lang/String;" }
 					)) { throw; }
 					if(type.rank != 4) { throw; }
 				}

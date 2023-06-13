@@ -147,6 +147,16 @@ namespace class_file::method_descriptor {
 		);
 	}
 
+	template<basic_iterator Iterator, typename ErrorHandler>
+	optional<uint8> constexpr try_read_parameters_count(
+		Iterator&& iterator, ErrorHandler&& error_handler
+	) {
+		reader r{ iterator };
+		return r.try_read_parameters_count(
+			forward<ErrorHandler>(error_handler)
+		);
+	}
+
 	template<basic_iterator Iterator, typename Handler, typename ErrorHandler>
 	void try_read_return_type(
 		Iterator&& iterator, Handler&& handler, ErrorHandler&& error_handler

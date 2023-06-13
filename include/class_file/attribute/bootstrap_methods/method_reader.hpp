@@ -1,5 +1,6 @@
 #pragma once
 
+#include "./method_reader_writer_stages.hpp"
 #include "./arguments_count.hpp"
 #include "../../constant.hpp"
 
@@ -8,27 +9,19 @@
 
 namespace class_file::attribute::bootstrap::method {
 
-	enum class reader_stage {
-		reference_index,
-		arguments_count,
-		arguments
-	};
-
-	template<
-		basic_iterator Iterator, reader_stage Stage = reader_stage::reference_index
-	>
+	template<basic_iterator Iterator, stage Stage = stage::reference_index>
 	class reader {
 		const Iterator iterator_;
 	public:
 
-		reader(Iterator it) : iterator_{ it } {}
+		reader(Iterator iterator) : iterator_{ iterator } {}
 
 		tuple<
 			constant::method_handle_index,
-			reader<Iterator, reader_stage::arguments_count>
+			reader<Iterator, stage::arguments_count>
 		>
 		read_reference_index_and_get_arguments_count_reader()
-		requires (Stage == reader_stage::reference_index)
+		requires (Stage == stage::reference_index)
 		{
 			Iterator i = iterator_;
 			constant::method_handle_index reference_index {
@@ -39,10 +32,10 @@ namespace class_file::attribute::bootstrap::method {
 
 		tuple<
 			arguments_count,
-			reader<Iterator, reader_stage::arguments>
+			reader<Iterator, stage::arguments>
 		>
 		read_and_get_arguments_reader()
-		requires (Stage == reader_stage::arguments_count)
+		requires (Stage == stage::arguments_count)
 		{
 			Iterator i = iterator_;
 			arguments_count arguments_count {
@@ -52,7 +45,7 @@ namespace class_file::attribute::bootstrap::method {
 		}
 
 		template<typename Handler>
-		requires (Stage == reader_stage::arguments)
+		requires (Stage == stage::arguments)
 		void
 		read(
 			arguments_count arguments_count, Handler&& handler

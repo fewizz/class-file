@@ -13,4 +13,4 @@ namespace class_file::attribute::code {
 		class_file::constant::class_index catch_type;
 	};
 
-} // class_file
+}

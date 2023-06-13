@@ -9,7 +9,7 @@ int main() {
 	nuint param = 0;
 
 	method_descriptor::try_read_parameter_types(
-		c_string{ "(IF[[[[I)V" }.iterator(),
+		c_string{ u8"(IF[[[[I)V" }.iterator(),
 		[&]<typename Type>(Type type) {
 			if constexpr(same_as<Type, i>) {
 				if(param++ != 0) { throw 1; }
@@ -19,7 +19,10 @@ int main() {
 			}
 			else if constexpr(same_as<Type, class_file::array>) {
 				if(param++ != 2) { throw 3; }
-				if(!type.component().have_elements_equal_to(c_string{ "I" }) ||
+				if(
+					!type.component()
+					.has_equal_size_and_elements(c_string{ "I" })
+					||
 					type.rank != 4
 				) {
 					throw 4;
@@ -33,7 +36,7 @@ int main() {
 	);
 
 	method_descriptor::try_read_return_type(
-		c_string{ "(IF[J)D" }.iterator(),
+		c_string{ u8"(IF[J)D" }.iterator(),
 		[&]<typename Type>(Type) {
 			if constexpr(!same_as<Type, d>) {
 				throw 10;
@@ -43,7 +46,7 @@ int main() {
 	);
 
 	method_descriptor::try_read_parameter_and_return_types(
-		c_string{ "(Lsmth;)[I" }.iterator(),
+		c_string{ u8"(Lsmth;)[I" }.iterator(),
 		[&]<typename ParamType>(ParamType) {
 			if constexpr(!same_as<ParamType, class_file::object>) {
 				throw 20;
