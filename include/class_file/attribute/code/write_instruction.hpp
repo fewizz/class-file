@@ -3,16 +3,17 @@
 #include "./instruction.hpp"
 
 #include <iterator_and_sentinel.hpp>
+#include <output_stream.hpp>
 #include <endianness.hpp>
 #include <write.hpp>
 
 namespace class_file::attribute::code::instruction {
 
-	template<typename Instruction, basic_iterator Iterator>
+	template<basic_output_stream<uint8> OS, typename Instruction>
 	void write(
-		Iterator&& iterator, Instruction instruction, Iterator begin
+		OS&& os, Instruction instruction, basic_iterator auto begin
 	) {
-		::write<uint8>(iterator, Instruction::code);
+		::write<uint8>(os, Instruction::code);
 
 		if constexpr(same_as_any<Instruction,
 			nop, a_const_null, i_const_m1, i_const_0, i_const_1, i_const_2,
@@ -22,24 +23,24 @@ namespace class_file::attribute::code::instruction {
 			// do nothing
 		}
 		else if constexpr(same_as<Instruction, bi_push>) {
-			::write<int8>(instruction.value, iterator);
+			::write<int8>(instruction.value, os);
 		}
 		else if constexpr(same_as<Instruction, si_push>) {
-			::write<int16, endianness::big>(instruction.value, iterator);
+			::write<int16, endianness::big>(instruction.value, os);
 		}
 		else if constexpr(same_as<Instruction, ldc>) {
-			::write<uint8>(instruction.index, iterator);
+			::write<uint8>(instruction.index, os);
 		}
 		else if constexpr(same_as<Instruction, ldc_w>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as<Instruction, ldc_2_w>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as_any<Instruction,
 			i_load, l_load, f_load, d_load, a_load
 		>) {
-			::write<uint8>(instruction.index, iterator);
+			::write<uint8>(instruction.index, os);
 		}
 		else if constexpr(same_as_any<Instruction,
 			i_load_0, i_load_1, i_load_2, i_load_3,
@@ -55,7 +56,7 @@ namespace class_file::attribute::code::instruction {
 		else if constexpr(same_as_any<Instruction,
 			i_store, l_store, f_store, d_store, a_store
 		>) {
-			::write<uint8>(instruction.index, iterator);
+			::write<uint8>(instruction.index, os);
 		}
 		else if constexpr(same_as_any<Instruction,
 			i_store_0, i_store_1, i_store_2, i_store_3,
@@ -89,8 +90,8 @@ namespace class_file::attribute::code::instruction {
 			// do nothing
 		}
 		else if constexpr(same_as<Instruction, i_inc>){
-			::write<uint8>(instruction.index, iterator);
-			::write<int8>(instruction.value, iterator);
+			::write<uint8>(instruction.index, os);
+			::write<int8>(instruction.value, os);
 		}
 		else if constexpr(same_as_any<Instruction,
 			i_to_l, i_to_f, i_to_d,
@@ -115,32 +116,32 @@ namespace class_file::attribute::code::instruction {
 			if_a_cmp_eq, if_a_cmp_ne,
 			go_to, jmp_sr
 		>) {
-			::write<int16, endianness::big>(instruction.branch, iterator);
+			::write<int16, endianness::big>(instruction.branch, os);
 		}
 		else if constexpr(same_as<Instruction, return_sr>) {
-			::write<int8>(instruction.index, iterator);
+			::write<int8>(instruction.index, os);
 		}
 		// table_switch and lookup_switch are below
 		else if constexpr(same_as<Instruction, table_switch>) {
-			while((iterator - begin) % 4 != 0) {
-				++iterator;
+			while((os - begin) % 4 != 0) {
+				++os;
 			}
-			::write<int32, endianness::big>(instruction._default, iterator);
-			::write<int32, endianness::big>(instruction.low, iterator);
-			::write<int32, endianness::big>(instruction.high, iterator);
+			::write<int32, endianness::big>(instruction._default, os);
+			::write<int32, endianness::big>(instruction.low, os);
+			::write<int32, endianness::big>(instruction.high, os);
 			for(int32 offset : instruction.offsets) {
-				::write<int32, endianness::big>(offset, iterator);
+				::write<int32, endianness::big>(offset, os);
 			}
 		}
 		else if constexpr(same_as<Instruction, lookup_switch>) {
-			while((iterator - begin) % 4 != 0) {
-				++iterator;
+			while((os - begin) % 4 != 0) {
+				++os;
 			}
-			::write<int32, endianness::big>(instruction._default, iterator);
-			::write<int32, endianness::big>(instruction.pairs.size(), iterator);
+			::write<int32, endianness::big>(instruction._default, os);
+			::write<int32, endianness::big>(instruction.pairs.size(), os);
 			for(match_offset mo : instruction.match_offsets) {
-				::write<int32, endianness::big>(mo.match, iterator);
-				::write<int32, endianness::big>(mo.offset, iterator);
+				::write<int32, endianness::big>(mo.match, os);
+				::write<int32, endianness::big>(mo.offset, os);
 			}
 		}
 		else if constexpr(same_as_any<Instruction,
@@ -153,32 +154,32 @@ namespace class_file::attribute::code::instruction {
 			get_field, put_field,
 			invoke_virtual, invoke_special, invoke_static
 		>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as<Instruction, invoke_interface>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
-			::write<uint8>(instruction.count, iterator);
-			::write<uint8>(0, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint8>(instruction.count, os);
+			::write<uint8>(0, os);
 		}
 		else if constexpr(same_as<Instruction, invoke_dynamic>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
-			::write<uint8>(0, iterator);
-			::write<uint8>(0, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint8>(0, os);
+			::write<uint8>(0, os);
 		}
 		else if constexpr(same_as<Instruction, _new>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as<Instruction, new_array_type>) {
-			::write<uint8>(instruction, iterator);
+			::write<uint8>(instruction, os);
 		}
 		else if constexpr(same_as<Instruction, a_new_array>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as_any<Instruction, array_length, a_throw>) {
 			// do nothing
 		}
 		else if constexpr(same_as_any<Instruction, check_cast, instance_of>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as_any<Instruction,
 			monitor_enter, monitor_exit
@@ -186,25 +187,25 @@ namespace class_file::attribute::code::instruction {
 			// do nothing
 		}
 		else if constexpr(same_as_any<Instruction, wide_format_1>) {
-			::write<uint8>(instruction.other_code, iterator);
-			::write<uint16, endianness::big>(instruction.index, iterator);
+			::write<uint8>(instruction.other_code, os);
+			::write<uint16, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as_any<Instruction, wide_format_2>) {
-			::write<uint8>(iterator, wide_format_2::other_code);
-			::write<uint16, endianness::big>(instruction.index, iterator);
-			::write<uint16, endianness::big>(instruction.value, iterator);
+			::write<uint8>(os, wide_format_2::other_code);
+			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint16, endianness::big>(instruction.value, os);
 		}
 		else if constexpr(same_as<Instruction, multi_new_array>) {
-			::write<uint16, endianness::big>(instruction.index, iterator);
-			::write<uint8>(instruction.dimensions, iterator);
+			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint8>(instruction.dimensions, os);
 		}
 		else if constexpr(same_as_any<Instruction,
 			if_null, if_non_null
 		>) {
-			::write<int16, endianness::big>(instruction.banch, iterator);
+			::write<int16, endianness::big>(instruction.banch, os);
 		}
 		else if constexpr(same_as_any<Instruction, go_to_w, jmp_sr_w>) {
-			::write<int32, endianness::big>(instruction.banch, iterator);
+			::write<int32, endianness::big>(instruction.banch, os);
 		}
 		else {
 			Instruction::UNKNOWN;

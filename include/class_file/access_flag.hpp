@@ -42,6 +42,8 @@ namespace class_file {
 		bool _enum     :1;
 		bool _module   :1;
 
+		access_flags() {}
+
 		access_flags(access_flag flag) {
 			((access_flag&) *this) = flag; // ugh
 		}
