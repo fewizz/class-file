@@ -2,6 +2,7 @@
 
 #include <integer.hpp>
 #include <span.hpp>
+#include <c_string.hpp>
 
 #include <unicode/utf8.hpp>
 
@@ -95,10 +96,10 @@ namespace class_file::constant {
 
 	struct skip {};
 
-	struct utf8 : span<const ::utf8::unit, uint16> {
+	struct utf8 : c_string_of_known_size<::utf8::unit, uint16> {
 		static constexpr uint8 tag = 1;
 	private:
-		using base_type = span<const ::utf8::unit, uint16>;
+		using base_type = c_string_of_known_size<::utf8::unit, uint16>;
 	public:
 		using base_type::base_type;
 	};
