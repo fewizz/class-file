@@ -11,43 +11,44 @@
 
 namespace class_file::line_numbers {
 
-	template<basic_iterator Iterator, stage Stage = stage::count>
+	template<basic_input_stream<uint8> IS, stage Stage = stage::count>
 	class reader {
-		const Iterator iterator_;
+		IS is_;
 	public:
 
 		static constexpr attribute::type attribute_type
 			= attribute::type::line_numbers;
 
-		reader(Iterator iterator) : iterator_{ iterator } {}
+		reader(IS&& is) : is_{ forward<IS>(is) } {}
 
-		tuple<uint16, reader<Iterator, stage::line_numbers>>
+		tuple<uint16, reader<IS, stage::line_numbers>>
 		read_count_and_get_line_numbers_reader()
 		requires (Stage == stage::count) {
-			Iterator i = iterator_;
-			uint16 count = ::read<uint16, endianness::big>(i);
-			return { count, { i } };
+			uint16 count = ::read<uint16, endianness::big>(is_);
+			return { count, { forward<IS>(is_) } };
 		}
 
 		template<typename Handler>
 		requires (Stage == stage::line_numbers)
-		Iterator read_and_get_advanced_iterator(
+		IS read_and_get_advanced_iterator(
 			uint16 count, Handler&& handler
 		) {
-			Iterator i = iterator_;
 			while(count > 0) {
 				--count;
 				uint16 start_pc {
-					::read<uint16, endianness::big>(i)
+					::read<uint16, endianness::big>(is_)
 				};
 				class_file::line_number line_number {
-					::read<uint16, endianness::big>(i)
+					::read<uint16, endianness::big>(is_)
 				};
 				handler(start_pc, line_number);
 			}
-			return i;
+			return forward<IS>(is_);
 		}
 
 	};
+
+	template<basic_input_stream<uint8> IS>
+	reader(IS&&) -> reader<IS>;
 
 }

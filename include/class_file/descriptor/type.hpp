@@ -10,14 +10,10 @@ namespace class_file {
 
 	template<utf8::unit Term>
 	struct base {
-		static constexpr utf8::unit term_ = Term;
-
-		static constexpr utf8::unit term() {
-			return term_;
-		}
+		static constexpr utf8::unit term = Term;
 
 		constexpr auto utf8_string() {
-			return c_string_of_known_size<utf8::unit>{ &term_, 1 };
+			return c_string_of_known_size<utf8::unit>{ &term, 1 };
 		}
 	};
 
@@ -32,47 +28,45 @@ namespace class_file {
 	struct s : base<u8'S'>{};
 	struct z : base<u8'Z'>{};
 
-	struct object : span<const utf8::unit, uint64> {
+	struct object : c_string_of_known_size<utf8::unit> {
+		using base_type = c_string_of_known_size<utf8::unit>;
+		using base_type::base_type;
 
-		constexpr object(const utf8::unit* ptr, nuint len) :
-			span<const utf8::unit, uint64>{ ptr, len }
-		{}
-
-		constexpr object(const object&) = default;
-		constexpr object& operator = (const object&) = default;
-
-		constexpr auto utf8_string() {
-			return *this;
-		}
+		constexpr object(base_type str) : base_type{ str } {}
 	};
 
-	struct array : span<const utf8::unit> {
+	struct array : object {
 		uint8 rank;
 
-		constexpr array(span<const utf8::unit> name, uint8 rank) :
-			span<const utf8::unit>{ name },
-			rank{ rank }
+		constexpr array(c_string_of_known_size<utf8::unit> str, uint8 rank) :
+			object{ str }, rank{ rank }
 		{}
 
-		constexpr array(const array&) = default;
-		constexpr array& operator = (const array&) = default;
-
-		constexpr span<const utf8::unit, uint16> component() {
-			return span{ iterator() + rank, size() - rank };
-		};
-
-		constexpr auto utf8_string() {
-			return *this;
+		constexpr object element_type() {
+			return { iterator() + rank, size() - rank };
 		}
 	};
 
 	template<typename Type>
-	concept descriptor_type =
-		same_as<Type, v> ||
+	concept primitive_type =
 		same_as<Type, b> || same_as<Type, c> ||
 		same_as<Type, d> || same_as<Type, f> ||
 		same_as<Type, i> || same_as<Type, j> ||
-		same_as<Type, s> || same_as<Type, z> ||
+		same_as<Type, s> || same_as<Type, z>;
+
+	template<typename Type>
+	concept reference_type =
 		same_as<Type, object> || same_as<Type, array>;
+
+	template<typename Type>
+	concept field_descriptor_type =
+		primitive_type<Type> || reference_type<Type>;
+
+	template<typename Type>
+	concept parameter_descriptor_type = field_descriptor_type<Type>;
+	
+	template<typename Type>
+	concept return_descriptor_type =
+		field_descriptor_type<Type> || same_as<Type, v>;
 
 }

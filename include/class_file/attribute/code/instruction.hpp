@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../constant.hpp"
+#include "../../descriptor/type.hpp"
 
 #include <span.hpp>
 

@@ -7,36 +7,36 @@
 #include "./../line_numbers/reader.hpp"
 #include "./../source_file/reader.hpp"
 
-template<basic_iterator Iterator>
+template<basic_input_stream<uint8> IS>
 template<
 	typename IndexToUtf8Mapper,
 	typename Handler
 >
-Iterator
-class_file::attribute::reader<Iterator>::read_and_get_advanced_iterator(
+IS
+class_file::attribute::reader<IS>::read_and_get_advanced_iterator(
 	IndexToUtf8Mapper&& mapper, Handler&& handler
-) const {
-	Iterator i = iterator_;
+) {
 	constant::name_index name_index {
-		::read<uint16, endianness::big>(i)
+		::read<uint16, endianness::big>(is_)
 	};
 	constant::utf8 name = mapper(name_index);
 
-	uint32 length = ::read<uint32, endianness::big>(i);
+	uint32 length = ::read<uint32, endianness::big>(is_);
 
+	remove_reference<IS> cpy = is_; // TODO
 	if(
 		name.has_equal_size_and_elements(c_string{ "Code" })
-	) { handler(code::reader{ i }); }
+	) { handler(code::reader{ cpy }); }
 	else if(
 		name.has_equal_size_and_elements(c_string{ "BootstrapMethods" })
-	) { handler(bootstrap_methods::reader{ i }); }
+	) { handler(bootstrap_methods::reader{ cpy }); }
 	else if(
 		name.has_equal_size_and_elements(c_string{ "LineNumberTable" })
-	) { handler(line_numbers::reader{ i }); }
+	) { handler(line_numbers::reader{ cpy }); }
 	else if(
 		name.has_equal_size_and_elements(c_string{ "SourceFile" })
-	) { handler(source_file::reader{ i }); }
+	) { handler(source_file::reader{ cpy }); }
 
-	i += length;
-	return i;
+	is_ += length;
+	return forward<IS>(is_);
 }

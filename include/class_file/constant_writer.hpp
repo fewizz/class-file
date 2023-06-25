@@ -20,10 +20,6 @@ namespace class_file::constant {
 		writer(      writer&&) = delete;
 		writer(const writer& ) = delete;
 
-		Iterator iterator_copy() const {
-			return iterator_;
-		}
-
 		void operator () (utf8 str) {
 			write<uint16, endianness::big>(iterator_, str.size());
 			for(int i = 0; i < str.size(); ++i) {

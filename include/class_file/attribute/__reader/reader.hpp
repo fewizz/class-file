@@ -9,28 +9,27 @@
 
 namespace class_file::attribute {
 
-	template<basic_iterator Iterator>
+	template<basic_input_stream<uint8> IS>
 	class reader {
-		const Iterator iterator_;
+		IS is_;
 	public:
 
-		reader(Iterator it) : iterator_{ it } {}
+		reader(IS&& is) : is_{ forward<IS>(is) } {}
 
 		template<
 			typename IndexToUtf8Mapper,
 			typename Handler
 		>
-		Iterator read_and_get_advanced_iterator(
+		IS read_and_get_advanced_iterator(
 			IndexToUtf8Mapper&& mapper, Handler&& handler
-		) const;
+		);
 
-		Iterator skip_and_get_advanced_iterator() const {
-			Iterator i = iterator_;
-			read<uint16, endianness::big>(i); // skip attribute index
-			uint32 length = read<uint32, endianness::big>(i);
+		IS skip_and_get_advanced_iterator() {
+			read<uint16, endianness::big>(is_); // skip attribute index
+			uint32 length = read<uint32, endianness::big>(is_);
 
-			i += length;
-			return i;
+			is_ += length;
+			return forward<IS>(is_);
 		}
 	};
 

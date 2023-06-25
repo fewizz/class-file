@@ -19,8 +19,6 @@ namespace class_file::attribute {
 		writer(const writer& ) = delete;
 		writer(      writer&&) = delete;
 
-		Iterator iterator_copy() const { return iterator_; }
-
 		template<
 			typename IndexToUtf8Mapper,
 			typename Handler

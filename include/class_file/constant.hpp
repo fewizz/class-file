@@ -61,6 +61,19 @@ namespace class_file::constant {
 		using index::index;
 
 	public:
+
+		method_or_interface_method_ref_index(
+			method_ref_index index
+		) :
+			constant::index{ index }
+		{}
+
+		method_or_interface_method_ref_index(
+			interface_method_ref_index index
+		) :
+			constant::index{ index }
+		{}
+
 		method_ref_index as_method_ref_index() const {
 			return method_ref_index{ *this };
 		}

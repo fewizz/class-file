@@ -13,49 +13,47 @@
 
 namespace class_file {
 
-	template<basic_iterator Iterator, stage Stage = stage::magic>
+	template<basic_input_stream<uint8> IS, stage Stage = stage::magic>
 	class reader {
-		const Iterator iterator_;
+		IS is_;
 	public:
 
-		reader(Iterator it) : iterator_{ it } {}
+		reader(IS&& is) : is_{ forward<IS>(is) } {}
 
 		tuple<
 			bool,
-			reader<Iterator, stage::version>
+			reader<IS, stage::version>
 		>
-		read_and_check_magic_and_get_version_reader() const
+		read_and_check_magic_and_get_version_reader()
 		requires (Stage == stage::magic) {
-			Iterator i = iterator_;
-			uint32 val = ::read<uint32, endianness::big>(i);
+			uint32 val = ::read<uint32, endianness::big>(is_);
 			bool result = val == 0xCAFEBABE;
-			return { result, { i } };
+			return { result, { forward<IS>(is_) } };
 		}
 
 		tuple<
 			class_file::version,
-			reader<Iterator, stage::constant_pool>
+			reader<IS, stage::constant_pool>
 		>
-		read_and_get_constant_pool_reader() const
+		read_and_get_constant_pool_reader()
 		requires (Stage == stage::version) {
-			Iterator i = iterator_;
-			uint16 minor = ::read<uint16, endianness::big>(i);
-			uint16 major = ::read<uint16, endianness::big>(i);
-			return { { major, minor }, { i } };
+			uint16 minor = ::read<uint16, endianness::big>(is_);
+			uint16 major = ::read<uint16, endianness::big>(is_);
+			return { { major, minor }, { forward<IS>(is_) } };
 		}
 
 		template<typename Handler>
-		reader<Iterator, stage::access_flags>
-		read_and_get_access_flags_reader(Handler&& handler) const
+		reader<IS, stage::access_flags>
+		read_and_get_access_flags_reader(Handler&& handler)
 		requires (Stage == stage::constant_pool) {
-			Iterator i = iterator_;
 			 // "constant_pool_count is equal to the number of entries
 			 // in the constant_pool table plus one"
-			uint16 entries_count = ::read<uint16, endianness::big>(i);
+			uint16 entries_count = ::read<uint16, endianness::big>(is_);
 			--entries_count; // minus one
 
 			while(entries_count > 0) {
-				i = constant::reader{ i }.read_and_get_advanced_iterator(
+				is_ = constant::reader{ forward<IS>(is_) }
+				.read_and_get_advanced_iterator(
 					[&](auto constant) {
 						--entries_count;
 						handler(constant);
@@ -63,13 +61,15 @@ namespace class_file {
 				);
 			}
 
-			return { i };
+			return { forward<IS>(is_) };
 		}
 
 		uint16 read_count() const
 		requires (Stage == stage::constant_pool) {
 			uint16 constant_pool_size = 0;
-			read_and_get_access_flags_reader(
+			reader<remove_reference<IS>, stage::constant_pool> {
+				remove_reference<IS>{ is_ }
+			}.read_and_get_access_flags_reader(
 				[&](auto) { ++constant_pool_size; }
 			);
 			return constant_pool_size;
@@ -77,125 +77,119 @@ namespace class_file {
 
 		tuple<
 			access_flags,
-			reader<Iterator, stage::this_class>
+			reader<IS, stage::this_class>
 		>
-		read_and_get_this_class_reader() const
+		read_and_get_this_class_reader()
 		requires (Stage == stage::access_flags) {
-			Iterator i = iterator_;
 			class_file::access_flags flags {
-				::read<access_flag, endianness::big>(i)
+				::read<access_flag, endianness::big>(is_)
 			};
-			return { flags, { i } };
+			return { flags, { forward<IS>(is_) } };
 		}
 
 		tuple<
 			constant::class_index,
-			reader<Iterator, stage::super_class>
+			reader<IS, stage::super_class>
 		>
-		read_and_get_super_class_reader() const
+		read_and_get_super_class_reader()
 		requires (Stage == stage::this_class) {
-			Iterator i = iterator_;
 			constant::class_index this_class_index {
-				::read<uint16, endianness::big>(i)
+				::read<uint16, endianness::big>(is_)
 			};
-			return { this_class_index, { i } };
+			return { this_class_index, { forward<IS>(is_) } };
 		}
 
 		tuple<
 			constant::class_index,
-			reader<Iterator, stage::interfaces>
+			reader<IS, stage::interfaces>
 		>
-		read_and_get_interfaces_reader() const
+		read_and_get_interfaces_reader()
 		requires (Stage == stage::super_class) {
-			Iterator i = iterator_;
 			constant::class_index super_class_index {
-				::read<uint16, endianness::big>(i)
+				::read<uint16, endianness::big>(is_)
 			};
-			return { super_class_index, { i } };
+			return { super_class_index, { forward<IS>(is_) } };
 		}
 
 		uint16 read_count() const
 		requires (Stage == stage::interfaces) {
-			Iterator i = iterator_;
+			remove_reference<IS> i = is_;
 			return ::read<uint16, endianness::big>(i);
 		}
 
 		template<typename Handler>
-		reader<Iterator, stage::fields>
-		read_and_get_fields_reader(Handler&& handler) const
+		reader<IS, stage::fields>
+		read_and_get_fields_reader(Handler&& handler)
 		requires (Stage == stage::interfaces) {
-			Iterator i = iterator_;
-			uint16 count = read<uint16, endianness::big>(i);
+			uint16 count = read<uint16, endianness::big>(is_);
 			for(uint16 x = 0; x < count; ++x) {
 				constant::class_index index {
-					::read<uint16, endianness::big>(i)
+					::read<uint16, endianness::big>(is_)
 				};
 				handler(index);
 			}
-			return { i };
+			return { forward<IS>(is_) };
 		}
 
 		uint16 read_count () const
 		requires (Stage == stage::fields) {
-			Iterator i = iterator_;
+			IS i = is_;
 			return ::read<uint16, endianness::big>(i);
 		}
 
 		template<typename Handler>
-		reader<Iterator, stage::methods>
-		read_and_get_methods_reader(Handler&& handler) const
+		reader<IS, stage::methods>
+		read_and_get_methods_reader(Handler&& handler)
 		requires (Stage == stage::fields) {
-			Iterator i = iterator_;
-			uint16 count = ::read<uint16, endianness::big>(i);
+			uint16 count = ::read<uint16, endianness::big>(is_);
 
 			for(uint16 x = 0; x < count; ++x) {
-				i = handler(field::reader{ i });
+				is_ = handler(field::reader{ forward<IS>(is_) });
 			}
 
-			return { i };
+			return { forward<IS>(is_) };
 		}
 
 		uint16 read_count () const
 		requires (Stage == stage::methods) {
-			Iterator i = iterator_;
+			IS i = is_;
 			return ::read<uint16, endianness::big>(i);
 		}
 
 		template<typename Handler>
-		reader<Iterator, stage::attributes>
-		read_and_get_attributes_reader(Handler&& handler) const
+		reader<IS, stage::attributes>
+		read_and_get_attributes_reader(Handler&& handler)
 		requires (Stage == stage::methods) {
-			Iterator i = iterator_;
-			uint16 count = ::read<uint16, endianness::big>(i);
+			uint16 count = ::read<uint16, endianness::big>(is_);
 
 			for(uint16 x = 0; x < count; ++x) {
-				i = handler(method::reader{ i });
+				is_ = handler(method::reader{ forward<IS>(is_) });
 			}
 
-			return { i };
+			return { forward<IS>(is_) };
 		}
 
 		template<typename Mapper, typename Handler>
-		Iterator
+		IS
 		read_and_get_advanced_iterator(
 			Mapper&& mapper, Handler&& handler
-		) const
+		)
 		requires (Stage == stage::attributes) {
-			Iterator i = iterator_;
-			uint16 count = ::read<uint16, endianness::big>(i);
+			uint16 count = ::read<uint16, endianness::big>(is_);
 			while(count > 0) {
 				--count;
-				i = attribute::reader{ i }.read_and_get_advanced_iterator(
+				is_ = attribute::reader{ forward<IS>(is_) }
+				.read_and_get_advanced_iterator(
 					forward<Mapper>(mapper),
 					handler
 				);
 			}
-			return i;
+			return forward<IS>(is_);
 		}
 
 	}; // reader
 
-	template<basic_iterator Iterator, stage Stage = stage::magic>
-	reader(Iterator) -> reader<Iterator, Stage>;
+	template<basic_input_stream<uint8> IS, stage Stage = stage::magic>
+	reader(IS&&) -> reader<IS, Stage>;
 
 } // class_file

@@ -9,17 +9,17 @@
 
 namespace class_file::attribute::bootstrap_methods {
 
-	enum class reader_stage {
+	enum class stage {
 		count,
 		methods
 	};
 
-	template<basic_iterator Iterator, reader_stage Stage = reader_stage::count>
+	template<basic_input_stream<uint8> IS, stage Stage = stage::count>
 	class reader {
-		const Iterator iterator_;
+		IS is_;
 	public:
 
-		reader(Iterator iterator) : iterator_{ iterator } {}
+		reader(IS&& is) : is_{ forward<IS>(is) } {}
 
 		static constexpr attribute::type attribute_type {
 			type::bootstrap_methods
@@ -27,32 +27,31 @@ namespace class_file::attribute::bootstrap_methods {
 
 		tuple<
 			bootstrap_methods::count,
-			reader<Iterator, reader_stage::methods>
+			reader<IS, stage::methods>
 		>
 		read_count_and_get_methods_reader()
-		requires (Stage == reader_stage::count)
-		{
-			Iterator i = iterator_;
+		requires (Stage == stage::count) {
 			bootstrap_methods::count count {
-				::read<uint16, endianness::big>(i)
+				::read<uint16, endianness::big>(is_)
 			};
-			return { count, { i } };
+			return { count, { forward<IS>(is_) } };
 		}
 
 		template<typename Handler>
-		requires (Stage == reader_stage::methods)
+		requires (Stage == stage::methods)
 		void
 		read(
 			bootstrap_methods::count count, Handler&& handler
 		) {
-			Iterator i = iterator_;
-
 			while(count > 0) {
 				--count;
-				handler(bootstrap::method::reader{ i });
+				handler(bootstrap::method::reader{ is_ });
 			}
 		}
 
 	};
+
+	template<basic_input_stream<uint8> IS>
+	reader(IS&&) -> reader<IS>;
 
 }

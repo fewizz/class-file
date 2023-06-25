@@ -18,8 +18,6 @@ namespace class_file::method {
 
 		writer(Iterator iterator) : iterator_{ iterator } {}
 
-		Iterator iterator_copy() const { return iterator_; }
-
 		writer<Iterator, stage::name_index>
 		write_access_flags_and_get_name_index_writer(
 			access_flags access_flags

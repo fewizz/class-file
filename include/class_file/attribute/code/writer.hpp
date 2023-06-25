@@ -24,8 +24,6 @@ namespace class_file::attribute::code {
 
 		writer(Iterator iterator) : iterator_{ iterator } {}
 
-		Iterator iterator_copy() const { return iterator_; }
-
 		writer<Iterator, stage::max_locals>
 		write_and_get_max_locals_writer(uint16 max_stack) const
 		requires (Stage == stage::max_stack) {

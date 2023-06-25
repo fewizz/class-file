@@ -10,24 +10,26 @@
 
 namespace class_file::source_file {
 
-	template<basic_iterator Iterator>
+	template<basic_input_stream<uint8> IS>
 	class reader {
-		const Iterator iterator_;
+		IS is_;
 	public:
 
 		static constexpr attribute::type attribute_type
 			= attribute::type::source_file;
 
-		reader(Iterator iterator) : iterator_{ iterator } {}
+		reader(IS&& is) : is_{ forward<IS>(is) } {}
 
-		tuple<constant::utf8_index, Iterator>
+		tuple<constant::utf8_index, IS>
 		read_index_and_get_advanced_iterator() {
-			Iterator i = iterator_;
 			constant::utf8_index index {
-				::read<uint16, endianness::big>(i)
+				::read<uint16, endianness::big>(is_)
 			};
-			return { index, i };
+			return { index, forward<IS>(is_) };
 		}
 	};
+
+	template<basic_input_stream<uint8> IS>
+	reader(IS&&) -> reader<IS>;
 
 }
