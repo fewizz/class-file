@@ -9,6 +9,16 @@
 
 namespace class_file::attribute::code::instruction {
 
+	template<basic_input_stream<uint8> IS>
+	struct offsets_input_stream {
+		IS& is_;
+
+		template<same_as<table_switch::offset>>
+		table_switch::offset read() const {
+			return { ::read<int32>(is_) };
+		}
+	};
+
 	template<basic_input_stream<uint8> IS, typename Handler>
 	decltype(auto) read(
 		IS&& is, basic_iterator auto begin, Handler&& handler
@@ -303,19 +313,22 @@ namespace class_file::attribute::code::instruction {
 				int32 _default = ::read<int32, endianness::big>(is);
 				int32 low = ::read<int32, endianness::big>(is);
 				int32 high = ::read<int32, endianness::big>(is);
-				auto n = high - low + 1;
-				int32 storage[n];
+				uint32 n = high - low + 1;
+				/*int32 storage[n];
 				for(int32 z = 0; z < n; ++z) {
 					int32 offset = ::read<int32, endianness::big>(is);
 					storage[z] = offset;
 				}
-				span<int32, uint32> offsets{ storage, (uint32) n };
+				span<int32, uint32> offsets{ storage, (uint32) n };*/
 				return handler(
 					table_switch {
-						_default,
-						low,
-						high,
-						offsets
+						._default = _default,
+						.low = low,
+						.high = high,
+						.offsets_count = n
+					},
+					offsets_input_stream {
+						is
 					}
 				);
 			}

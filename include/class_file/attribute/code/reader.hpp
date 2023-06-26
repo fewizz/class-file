@@ -23,31 +23,34 @@ namespace class_file::attribute::code {
 
 		static constexpr attribute::type attribute_type = type::code;
 
-		reader(IS&& is) : is_{ forward<IS>(is) } {}
+		reader(IS&& is) : is_{ ::forward<IS>(is) } {}
 
 		tuple<
 			uint16,
 			reader<IS, stage::max_locals>
 		>
-		read_max_stack_and_get_max_locals_reader() const
+		read_max_stack_and_get_max_locals_reader()
 		requires (Stage == stage::max_stack) {
 			uint16 max_stack = ::read<uint16, endianness::big>(is_);
-			return { { max_stack }, { forward<IS>(is_) } };
+			return { { max_stack }, { ::forward<IS>(is_) } };
 		}
 
 		tuple<uint16, reader<IS, stage::code>>
-		read_and_get_code_reader() const
+		read_and_get_code_reader()
 		requires (Stage == stage::max_locals) {
 			uint16 max_locals = ::read<uint16, endianness::big>(is_);
-			return { { max_locals }, { forward<IS>(is_) } };
+			return { { max_locals }, { ::forward<IS>(is_) } };
 		}
 
 		reader<IS, stage::exception_table>
-		skip_and_get_exception_table_reader() const
+		skip_and_get_exception_table_reader()
 		requires (Stage == stage::code && contiguous_iterator<IS>) {
 			uint32 length = ::read<uint32, endianness::big>(is_);
-			IS end = is_ + length;
-			return { end };
+			while(length > 0) {
+				::read<uint8>(is_);
+				--length;
+			}
+			return { ::forward<IS>(is_) };
 		}
 
 		auto read_as_span() const
@@ -59,14 +62,14 @@ namespace class_file::attribute::code {
 
 		template<typename Handler>
 		reader<IS, stage::exception_table>
-		read_and_get_exception_table_reader(Handler&& handler) const
+		read_and_get_exception_table_reader(Handler&& handler)
 		requires (Stage == stage::code && contiguous_iterator<IS>) {
 			uint32 length = ::read<uint32, endianness::big>(is_);
 			IS end = is_ + length;
 			IS begin = is_;
 
 			while(is_ - begin < length) {
-				instruction::read(is_, begin, forward<Handler>(handler));
+				instruction::read(is_, begin, ::forward<Handler>(handler));
 			}
 
 			return { end };
@@ -81,7 +84,7 @@ namespace class_file::attribute::code {
 
 		template<typename Handler>
 		reader<IS, stage::attributes>
-		read_and_get_attributes_reader(Handler&& handler) const
+		read_and_get_attributes_reader(Handler&& handler)
 		requires (Stage == stage::exception_table && contiguous_range<IS>) {
 			uint16 count = ::read<uint16, endianness::big>(is_);
 			IS end = is_ + sizeof(uint16) * count * 4;
@@ -114,7 +117,7 @@ namespace class_file::attribute::code {
 		template<typename Mapper, typename Handler>
 		IS read_and_get_advanced_iterator(
 			Mapper&& mapper, Handler&& handler
-		) const
+		)
 		requires (Stage == stage::attributes) {
 			uint16 count = ::read<uint16, endianness::big>(is_);
 			while(count > 0) {
@@ -134,4 +137,4 @@ namespace class_file::attribute::code {
 	template<basic_input_stream<uint8> IS>
 	reader(IS&&) -> reader<IS>;
 
-}
+} // class_file::attribute::code

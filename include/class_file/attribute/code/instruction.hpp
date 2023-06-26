@@ -297,13 +297,21 @@ namespace class_file::attribute::code::instruction {
 		int32 _default;
 		int32 low;
 		int32 high;
-		span<int32, uint32> offsets;
+		uint32 offsets_count;
+
+		struct offset {
+			int32 value;
+			operator int32() const { return value; }
+		};
+
 	};
-	struct match_offset { int32 match; int32 offset; };
+
 	struct lookup_switch {
 		static constexpr uint8 code = 171;
 		int32 _default;
-		span<match_offset, uint32> pairs;
+		uint32 pairs_count;
+		struct match_offset { int32 match; int32 offset; };
+		//span<match_offset, uint32> pairs;
 	};
 
 	struct i_return { static constexpr uint8 code = 172; };
