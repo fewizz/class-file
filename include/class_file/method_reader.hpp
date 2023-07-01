@@ -10,7 +10,8 @@
 namespace class_file::method {
 
 	template<
-		basic_input_stream<uint8> IS, stage Stage = stage::access_flags
+		basic_input_stream<uint8> IS,
+		stage Stage = stage::access_flags
 	>
 	class reader {
 		IS is_;
@@ -76,4 +77,4 @@ namespace class_file::method {
 	template<basic_input_stream<uint8> IS>
 	reader(IS&&) -> reader<IS>;
 
-}
+} // class_file::method

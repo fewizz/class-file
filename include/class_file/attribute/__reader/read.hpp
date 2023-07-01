@@ -7,6 +7,8 @@
 #include "./../line_numbers/reader.hpp"
 #include "./../source_file/reader.hpp"
 
+#include <c_string.hpp>
+
 template<basic_input_stream<uint8> IS>
 template<
 	typename IndexToUtf8Mapper,

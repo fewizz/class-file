@@ -53,7 +53,7 @@ namespace class_file::attribute::code {
 			return { ::forward<IS>(is_) };
 		}
 
-		auto read_as_span() const
+		auto get_as_span() const
 		requires (Stage == stage::code && contiguous_iterator<IS>) {
 			remove_reference<IS> i = is_;
 			uint32 length = ::read<uint32, endianness::big>(i);
@@ -65,8 +65,8 @@ namespace class_file::attribute::code {
 		read_and_get_exception_table_reader(Handler&& handler)
 		requires (Stage == stage::code && contiguous_iterator<IS>) {
 			uint32 length = ::read<uint32, endianness::big>(is_);
-			IS end = is_ + length;
-			IS begin = is_;
+			remove_reference<IS> end = is_ + length;
+			remove_reference<IS> begin = is_;
 
 			while(is_ - begin < length) {
 				instruction::read(is_, begin, ::forward<Handler>(handler));
@@ -75,7 +75,7 @@ namespace class_file::attribute::code {
 			return { end };
 		}
 
-		uint16 read_count() const
+		uint16 get_count() const
 		requires (Stage == stage::exception_table && contiguous_iterator<IS>) {
 			remove_reference<IS> i = is_;
 			uint16 count = ::read<uint16, endianness::big>(i);

@@ -1,6 +1,7 @@
 #include "class_file/descriptor/method.hpp"
 
 #include <range.hpp>
+#include <c_string.hpp>
 
 // optional isn't constexpr yet.
 int main() {

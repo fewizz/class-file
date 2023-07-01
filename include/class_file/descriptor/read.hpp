@@ -121,7 +121,7 @@ constexpr auto read_non_void_descriptor(
 
 		remove_reference<IS> ending = is;
 
-		c_string_of_known_size<utf8::unit> name {
+		span<const utf8::unit> name {
 			iterator_and_sentinel{ beginning, ending }.as_range()
 		};
 

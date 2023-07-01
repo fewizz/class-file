@@ -7,6 +7,8 @@
 #include "../line_numbers/writer.hpp"
 #include "../source_file/writer.hpp"
 
+#include <c_string.hpp>
+
 template<basic_iterator Iterator>
 template<
 	typename IndexToUtf8Mapper,

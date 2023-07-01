@@ -14,12 +14,20 @@ namespace class_file::attribute::bootstrap_methods {
 		methods
 	};
 
-	template<basic_input_stream<uint8> IS, stage Stage = stage::count>
+	template<
+		basic_input_stream<uint8> IS,
+		stage Stage = stage::count
+	>
 	class reader {
 		IS is_;
+		uint16 count_;
 	public:
 
 		reader(IS&& is) : is_{ forward<IS>(is) } {}
+		reader(IS&& is, uint16 count) :
+			is_{ forward<IS>(is) },
+			count_{ count }
+		{}
 
 		static constexpr attribute::type attribute_type {
 			type::bootstrap_methods
@@ -34,16 +42,17 @@ namespace class_file::attribute::bootstrap_methods {
 			bootstrap_methods::count count {
 				::read<uint16, endianness::big>(is_)
 			};
-			return { count, { forward<IS>(is_) } };
+			return {
+				count,
+				{ forward<IS>(is_), count },
+			};
 		}
 
 		template<typename Handler>
 		requires (Stage == stage::methods)
-		void read(
-			bootstrap_methods::count count, Handler&& handler
-		) {
-			while(count > 0) {
-				--count;
+		void read(Handler&& handler) {
+			while(count_ > 0) {
+				--count_;
 				handler(bootstrap::method::reader{ is_ });
 			}
 		}

@@ -10,7 +10,8 @@
 namespace class_file::field {
 
 	template<
-		basic_input_stream<uint8> IS, stage Stage = stage::access_flags
+		basic_input_stream<uint8> IS,
+		stage Stage = stage::access_flags
 	>
 	class reader {
 		IS is_;
@@ -59,7 +60,7 @@ namespace class_file::field {
 			Mapper&& mapper, Handler&& handler
 		)
 		requires (Stage == stage::attributes) {
-			uint16 count{ ::read<uint16, endianness::big>(is_) };
+			uint16 count = ::read<uint16, endianness::big>(is_);
 			while(count > 0) {
 				--count;
 				is_ = attribute::reader{ forward<IS>(is_) }
@@ -78,4 +79,4 @@ namespace class_file::field {
 	template<basic_input_stream<uint8> IS>
 	reader(IS&&) -> reader<IS>;
 
-}
+} // class_file::field

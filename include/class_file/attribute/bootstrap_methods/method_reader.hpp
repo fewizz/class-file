@@ -9,12 +9,20 @@
 
 namespace class_file::attribute::bootstrap::method {
 
-	template<basic_input_stream<uint8> IS, stage Stage = stage::reference_index>
+	template<
+		basic_input_stream<uint8> IS,
+		stage Stage = stage::reference_index
+	>
 	class reader {
-		const IS is_;
+		IS is_;
+		uint16 arguments_count_;
 	public:
 
 		reader(IS&& is) : is_{ forward<IS>(is) } {}
+		reader(IS&& is, uint16 arguments_count) :
+			is_{ forward<IS>(is) },
+			arguments_count_{ arguments_count }
+		{}
 
 		tuple<
 			constant::method_handle_index,
@@ -37,17 +45,17 @@ namespace class_file::attribute::bootstrap::method {
 			arguments_count arguments_count {
 				::read<uint16, endianness::big>(is_)
 			};
-			return { arguments_count, { forward<IS>(is_) } };
+			return {
+				arguments_count,
+				{ forward<IS>(is_), arguments_count }
+			};
 		}
 
 		template<typename Handler>
 		requires (Stage == stage::arguments)
-		void
-		read(
-			arguments_count arguments_count, Handler&& handler
-		) {
-			while(arguments_count > 0) {
-				--arguments_count;
+		void read(Handler&& handler) {
+			while(arguments_count_ > 0) {
+				--arguments_count_;
 				constant::index argument_index {
 					::read<uint16, endianness::big>(is_)
 				};

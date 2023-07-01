@@ -13,7 +13,10 @@
 
 namespace class_file {
 
-	template<basic_input_stream<uint8> IS, stage Stage = stage::magic>
+	template<
+		basic_input_stream<uint8> IS,
+		stage Stage = stage::magic
+	>
 	class reader {
 		IS is_;
 	public:
@@ -64,10 +67,10 @@ namespace class_file {
 			return { forward<IS>(is_) };
 		}
 
-		uint16 read_count() const
+		uint16 get_count() const
 		requires (Stage == stage::constant_pool && contiguous_iterator<IS>) {
-			remove_reference<IS> is = is_;
-			uint16 entries_count = ::read<uint16, endianness::big>(is);
+			remove_reference<IS> i = is_;
+			uint16 entries_count = ::read<uint16, endianness::big>(i);
 			--entries_count; // minus one
 			return entries_count;
 		}
@@ -108,7 +111,7 @@ namespace class_file {
 			return { super_class_index, { forward<IS>(is_) } };
 		}
 
-		uint16 read_count() const
+		uint16 get_count() const
 		requires (Stage == stage::interfaces) {
 			remove_reference<IS> i = is_;
 			return ::read<uint16, endianness::big>(i);
@@ -118,7 +121,7 @@ namespace class_file {
 		reader<IS, stage::fields>
 		read_and_get_fields_reader(Handler&& handler)
 		requires (Stage == stage::interfaces) {
-			uint16 count = read<uint16, endianness::big>(is_);
+			uint16 count = ::read<uint16, endianness::big>(is_);
 			for(uint16 x = 0; x < count; ++x) {
 				constant::class_index index {
 					::read<uint16, endianness::big>(is_)
@@ -128,9 +131,9 @@ namespace class_file {
 			return { forward<IS>(is_) };
 		}
 
-		uint16 read_count () const
-		requires (Stage == stage::fields) {
-			IS i = is_;
+		uint16 get_count () const
+		requires (Stage == stage::fields && contiguous_iterator<IS>) {
+			remove_reference<IS> i = is_;
 			return ::read<uint16, endianness::big>(i);
 		}
 
@@ -147,9 +150,9 @@ namespace class_file {
 			return { forward<IS>(is_) };
 		}
 
-		uint16 read_count () const
+		uint16 get_count () const
 		requires (Stage == stage::methods) {
-			IS i = is_;
+			remove_reference<IS> i = is_;
 			return ::read<uint16, endianness::big>(i);
 		}
 
@@ -167,8 +170,7 @@ namespace class_file {
 		}
 
 		template<typename Mapper, typename Handler>
-		IS
-		read_and_get_advanced_iterator(
+		void read(
 			Mapper&& mapper, Handler&& handler
 		)
 		requires (Stage == stage::attributes) {
@@ -181,6 +183,17 @@ namespace class_file {
 					handler
 				);
 			}
+		}
+
+		template<typename Mapper, typename Handler>
+		IS read_and_get_advanced_iterator(
+			Mapper&& mapper, Handler&& handler
+		)
+		requires (Stage == stage::attributes) {
+			read(
+				forward<Mapper>(mapper),
+				forward<Handler>(handler)
+			);
 			return forward<IS>(is_);
 		}
 

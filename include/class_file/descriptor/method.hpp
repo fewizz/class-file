@@ -2,7 +2,6 @@
 
 #include "./read.hpp"
 
-#include <c_string.hpp>
 #include <optional.hpp>
 
 namespace class_file::method_descriptor {
@@ -92,7 +91,7 @@ namespace class_file::method_descriptor {
 				);
 				if(error_happened) { return {}; }
 				IS end = is_;
-				handler(c_string {
+				handler(span {
 					(const utf8::unit*) begin,
 					iterator_and_sentinel{ begin, end }.distance()
 				});

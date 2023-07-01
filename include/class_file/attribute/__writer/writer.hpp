@@ -5,7 +5,6 @@
 #include <write.hpp>
 #include <array.hpp>
 #include <range.hpp>
-#include <c_string.hpp>
 
 namespace class_file::attribute {
 
