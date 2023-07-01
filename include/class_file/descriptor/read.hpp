@@ -17,21 +17,21 @@ template<
 	typename Handler,
 	typename ErrorHandler
 >
-constexpr void read_non_void_non_array_descriptor(
+constexpr auto read_non_void_non_array_descriptor(
 	utf8::unit first_char,
 	IS&& is,
 	Handler&& handler,
 	ErrorHandler&& error_handler
-) {
+) -> decltype(handler(class_file::object{})) {
 	switch (first_char) {
-		case u8'B': handler.template operator () <class_file::b> (); return;
-		case u8'C': handler.template operator () <class_file::c> (); return;
-		case u8'D': handler.template operator () <class_file::d> (); return;
-		case u8'F': handler.template operator () <class_file::f> (); return;
-		case u8'I': handler.template operator () <class_file::i> (); return;
-		case u8'J': handler.template operator () <class_file::j> (); return;
-		case u8'S': handler.template operator () <class_file::s> (); return;
-		case u8'Z': handler.template operator () <class_file::z> (); return;
+		case u8'B': return handler.template operator () <class_file::b> ();
+		case u8'C': return handler.template operator () <class_file::c> ();
+		case u8'D': return handler.template operator () <class_file::d> ();
+		case u8'F': return handler.template operator () <class_file::f> ();
+		case u8'I': return handler.template operator () <class_file::i> ();
+		case u8'J': return handler.template operator () <class_file::j> ();
+		case u8'S': return handler.template operator () <class_file::s> ();
+		case u8'Z': return handler.template operator () <class_file::z> ();
 		case u8'L': {
 			if constexpr(
 				contiguous_iterator<IS>
@@ -44,16 +44,14 @@ constexpr void read_non_void_non_array_descriptor(
 					iterator_and_sentinel { beginning, ending }.as_range()
 				};
 
-				handler.operator () (name);
+				return handler.operator () (name);
 			}
 			else {
 				[]<bool b = false>{ static_assert(b); }();
 			}
-			return;
 		}
 		default: {
-			error_handler(type_descriptor_read_error::unknown_type);
-			return;
+			return error_handler(type_descriptor_read_error::unknown_type);
 		}
 	}
 }
@@ -63,21 +61,20 @@ template<
 	typename Handler,
 	typename ErrorHandler
 >
-constexpr void read_non_void_descriptor(
+constexpr auto read_non_void_descriptor(
 	utf8::unit first_char,
 	IS&& is,
 	Handler&& handler,
 	ErrorHandler&& error_handler
-) {
+) -> decltype(handler(class_file::object{})) {
 
 	if(first_char != '[') {
-		read_non_void_non_array_descriptor(
+		return read_non_void_non_array_descriptor(
 			first_char,
 			is,
 			forward<Handler>(handler),
 			forward<ErrorHandler>(error_handler)
 		);
-		return;
 	}
 
 	if constexpr(contiguous_iterator<IS>) {
@@ -88,17 +85,38 @@ constexpr void read_non_void_descriptor(
 			++rank;
 		}
 		bool error_happened = false;
-		read_non_void_non_array_descriptor(
-			ch,
-			is,
-			[]<typename...>(auto...){},
-			[&](auto error) {
-				error_happened = true;
-				error_handler(error);
-			}
+		using error_handler_return_type = decltype(
+			error_handler(type_descriptor_read_error{})
 		);
-		if(error_happened) {
-			return;
+
+		if constexpr(!same_as<error_handler_return_type, void>) {
+			optional<error_handler_return_type> error_handler_result;
+			read_non_void_non_array_descriptor(
+				ch,
+				is,
+				[&]<typename...>(auto...) {},
+				[&](auto error) {
+					error_happened = true;
+					error_handler_result = error_handler(error);
+				}
+			);
+			if(error_happened) {
+				return error_handler_result.move();
+			}
+		}
+		else {
+			read_non_void_non_array_descriptor(
+				ch,
+				is,
+				[&]<typename...>(auto...) {},
+				[&](auto error) {
+					error_happened = true;
+					error_handler(error);
+				}
+			);
+			if(error_happened) {
+				return;
+			}
 		}
 
 		remove_reference<IS> ending = is;
@@ -107,7 +125,7 @@ constexpr void read_non_void_descriptor(
 			iterator_and_sentinel{ beginning, ending }.as_range()
 		};
 
-		handler.operator () (class_file::array{ name, rank });
+		return handler.operator () (class_file::array{ name, rank });
 	}
 	else {
 		[]<bool b = false>{ static_assert(b); }();
@@ -119,17 +137,17 @@ template<
 	typename Handler,
 	typename ErrorHandler
 >
-constexpr void read_possibly_void_descriptor(
+constexpr auto read_possibly_void_descriptor(
 	utf8::unit first_char,
 	IS&& is,
 	Handler&& handler,
 	ErrorHandler&& error_handler
-) {
+) -> decltype(handler(class_file::object{})) {
 	if(first_char == 'V') {
-		handler.template operator () <class_file::v> ();
+		return handler.template operator () <class_file::v> ();
 	}
 	else {
-		read_non_void_descriptor(
+		return read_non_void_descriptor(
 			first_char,
 			forward<IS>(is),
 			forward<Handler>(handler),

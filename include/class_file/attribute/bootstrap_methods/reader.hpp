@@ -39,8 +39,7 @@ namespace class_file::attribute::bootstrap_methods {
 
 		template<typename Handler>
 		requires (Stage == stage::methods)
-		void
-		read(
+		void read(
 			bootstrap_methods::count count, Handler&& handler
 		) {
 			while(count > 0) {

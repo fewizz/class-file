@@ -14,13 +14,13 @@ namespace class_file {
 		typename Handler,
 		typename ErrorHandler
 	>
-	void constexpr read_field_descriptor(
+	constexpr auto read_field_descriptor(
 		IS&& is,
 		Handler&& handler,
 		ErrorHandler&& error_handler
-	) {
+	) -> decltype(handler(class_file::object{})) {
 		utf8::unit first_char = read<utf8::unit>(is);
-		read_non_void_descriptor(
+		return read_non_void_descriptor(
 			first_char,
 			forward<IS>(is),
 			forward<Handler>(handler),

@@ -2,7 +2,6 @@
 
 #include <span.hpp>
 #include <array.hpp>
-#include <c_string.hpp>
 
 #include <unicode/utf8.hpp>
 
@@ -12,8 +11,8 @@ namespace class_file {
 	struct base {
 		static constexpr utf8::unit term = Term;
 
-		constexpr auto utf8_string() {
-			return c_string_of_known_size<utf8::unit>{ &term, 1 };
+		static constexpr auto utf8_string() {
+			return span<const utf8::unit>{ &term, 1 };
 		}
 	};
 
@@ -28,23 +27,22 @@ namespace class_file {
 	struct s : base<u8'S'>{};
 	struct z : base<u8'Z'>{};
 
-	struct object : c_string_of_known_size<utf8::unit> {
-		using base_type = c_string_of_known_size<utf8::unit>;
-		using base_type::base_type;
-
-		constexpr object(base_type str) : base_type{ str } {}
+	struct object : span<const utf8::unit> {
+		using span<const utf8::unit>::span;
+		constexpr object(span<const utf8::unit> str) : span{ str } {}
 	};
 
 	struct array : object {
 		uint8 rank;
 
-		constexpr array(c_string_of_known_size<utf8::unit> str, uint8 rank) :
+		constexpr array(span<const utf8::unit> str, uint8 rank) :
 			object{ str }, rank{ rank }
 		{}
 
 		constexpr object element_type() {
 			return { iterator() + rank, size() - rank };
 		}
+
 	};
 
 	template<typename Type>
@@ -59,14 +57,20 @@ namespace class_file {
 		same_as<Type, object> || same_as<Type, array>;
 
 	template<typename Type>
-	concept field_descriptor_type =
+	concept non_void_descriptor_type =
 		primitive_type<Type> || reference_type<Type>;
 
 	template<typename Type>
-	concept parameter_descriptor_type = field_descriptor_type<Type>;
+	concept field_descriptor_type = non_void_descriptor_type<Type>;
+
+	template<typename Type>
+	concept parameter_descriptor_type = non_void_descriptor_type<Type>;
+
+	template<typename Type>
+	concept possibly_void_descriptor_type =
+		non_void_descriptor_type<Type> || same_as<Type, v>;
 	
 	template<typename Type>
-	concept return_descriptor_type =
-		field_descriptor_type<Type> || same_as<Type, v>;
+	concept return_descriptor_type = possibly_void_descriptor_type<Type>;
 
 }

@@ -65,14 +65,11 @@ namespace class_file {
 		}
 
 		uint16 read_count() const
-		requires (Stage == stage::constant_pool) {
-			uint16 constant_pool_size = 0;
-			reader<remove_reference<IS>, stage::constant_pool> {
-				remove_reference<IS>{ is_ }
-			}.read_and_get_access_flags_reader(
-				[&](auto) { ++constant_pool_size; }
-			);
-			return constant_pool_size;
+		requires (Stage == stage::constant_pool && contiguous_iterator<IS>) {
+			remove_reference<IS> is = is_;
+			uint16 entries_count = ::read<uint16, endianness::big>(is);
+			--entries_count; // minus one
+			return entries_count;
 		}
 
 		tuple<

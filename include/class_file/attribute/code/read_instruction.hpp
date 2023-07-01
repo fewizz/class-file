@@ -9,19 +9,184 @@
 
 namespace class_file::attribute::code::instruction {
 
-	template<basic_input_stream<uint8> IS>
-	struct offsets_input_stream {
-		IS& is_;
+	template<
+		basic_input_stream<uint8> IS,
+		table_switch::stage Stage
+	>
+	struct table_switch::reader {
+	private:
+		IS is_;
+		nuint count_;
 
-		template<same_as<table_switch::offset>>
-		table_switch::offset read() const {
-			return { ::read<int32>(is_) };
+	public:
+
+		reader(IS&& is_, nuint count) :
+			is_{ forward<IS>(is_) },
+			count_{count}
+		{}
+
+		reader(IS&& is_) : is_{ forward<IS>(is_) } {}
+
+		template<typename Handler>
+		reader<IS, stage::range>
+		align_and_get_info_reader(Handler&& handler)
+		requires (Stage == stage::align)
+		{
+			handler(is_);
+			return { forward<IS>(is_) };
 		}
+
+		tuple<table_switch, reader<IS, stage::offsets>>
+		read_and_get_offsets_reader()
+		requires (Stage == stage::range)
+		{
+			int32 _default = ::read<int32, endianness::big>(is_);
+			int32 low      = ::read<int32, endianness::big>(is_);
+			int32 high     = ::read<int32, endianness::big>(is_);
+			return {
+				table_switch {
+					._default = _default,
+					.low = low,
+					.high = high
+				},
+				reader<IS, stage::offsets> {
+					forward<IS>(is_),
+					(nuint)(high - low + 1)
+				}
+			};
+		}
+
+		template<typename Handler>
+		IS read_and_get_advanced_input_stream(Handler&& handler)
+		requires (Stage == stage::offsets)
+		{
+			while(count_ > 0) {
+				handler(offset{ ::read<int32, endianness::big>(is_) });
+				--count_;
+			}
+			return forward<IS>(is_);
+		}
+
+		void skip()
+		requires (Stage == stage::offsets)
+		{
+			while(count_ > 0) {
+				::read<int32, endianness::big>(is_);
+				--count_;
+			}
+		}
+
+		IS skip_and_get_advanced_input_stream()
+		requires (Stage == stage::offsets)
+		{
+			skip();
+			return forward<IS>(is_);
+		}
+
+		offset read_offset(uint32 index)
+		requires (Stage == stage::offsets && random_access_iterator<IS>)
+		{
+			is_ += index * sizeof(int32);
+			return { ::read<int32, endianness::big>(is_) };
+		}
+
+		tuple<offset, IS>
+		read_offset_and_get_advanced_input_stream(uint32 index)
+		requires (Stage == stage::offsets && random_access_iterator<IS>)
+		{
+			offset off = read_offset(index);
+			return {
+				off,
+				{ forward<IS>(is_) }
+			};
+		}
+	};
+
+	template<
+		basic_input_stream<uint8> IS,
+		lookup_switch::stage Stage
+	>
+	struct lookup_switch::reader {
+	private:
+		IS is_;
+		nuint count_;
+	public:
+
+		reader(IS&& is_) : is_{ forward<IS>(is_) } {}
+
+		reader(IS&& is_, nuint count) :
+			is_{ forward<IS>(is_) },
+			count_{count}
+		{}
+
+		template<typename Handler>
+		reader<IS, stage::range>
+		align_and_get_info_reader(Handler&& handler)
+		requires(Stage == stage::align)
+		{
+			handler(is_);
+			return { forward<IS>(is_) };
+		}
+
+		tuple<lookup_switch, reader<IS, stage::pairs>>
+		read_and_get_matches_and_offsets_reader()
+		requires(Stage == stage::range)
+		{
+			int32 _default    = ::read<int32, endianness::big>(is_);
+			int32 pairs_count = ::read<int32, endianness::big>(is_);
+			return {
+				lookup_switch {
+					._default = _default,
+					.pairs_count = pairs_count
+				},
+				reader<IS, stage::pairs> {
+					forward<IS>(is_),
+					(nuint) pairs_count
+				}
+			};
+		}
+
+		void skip() {
+			while(count_ > 0) {
+				::read<int32, endianness::big>(is_);
+				::read<int32, endianness::big>(is_);
+				--count_;
+			}
+		}
+
+		template<typename Handler, typename DefaultHandler = decltype([]{})>
+		void read(
+			Handler&& handler,
+			DefaultHandler&& default_handler = {}
+		)
+		requires(Stage == stage::pairs)
+		{
+			while(count_ > 0) {
+				int32 match = ::read<int32, endianness::big>(is_);
+				int32 offset = ::read<int32, endianness::big>(is_);
+				lookup_switch::match_and_offset pair{ match, offset };
+
+				if constexpr(same_as<decltype(handler(pair)), loop_action>) {
+					switch(handler(pair)) {
+						case loop_action::stop:
+							return;
+						case loop_action::next:
+							// nothin
+					}
+				}
+				else {
+					handler(pair);
+				}
+				--count_;
+			}
+			default_handler();
+		}
+
 	};
 
 	template<basic_input_stream<uint8> IS, typename Handler>
 	decltype(auto) read(
-		IS&& is, basic_iterator auto begin, Handler&& handler
+		IS&& is, Handler&& handler
 	) {
 		uint8 instruction_code = ::read<uint8>(is);
 
@@ -307,47 +472,10 @@ namespace class_file::attribute::code::instruction {
 				return handler(return_sr{ index });
 			}
 			case 170: {
-				while((is - begin) % 4 != 0) {
-					++is;
-				}
-				int32 _default = ::read<int32, endianness::big>(is);
-				int32 low = ::read<int32, endianness::big>(is);
-				int32 high = ::read<int32, endianness::big>(is);
-				uint32 n = high - low + 1;
-				/*int32 storage[n];
-				for(int32 z = 0; z < n; ++z) {
-					int32 offset = ::read<int32, endianness::big>(is);
-					storage[z] = offset;
-				}
-				span<int32, uint32> offsets{ storage, (uint32) n };*/
-				return handler(
-					table_switch {
-						._default = _default,
-						.low = low,
-						.high = high,
-						.offsets_count = n
-					},
-					offsets_input_stream {
-						is
-					}
-				);
+				return handler(table_switch::reader{ is });
 			}
 			case 171: {
-				while((is - begin) % 4 != 0) {
-					++is;
-				}
-				int32 _default = ::read<int32, endianness::big>(is);
-				uint32 n_pairs = ::read<uint32, endianness::big>(is);
-				match_offset storage[n_pairs];
-				for(nuint z = 0; z < n_pairs; ++z) {
-					int32 match = ::read<int32, endianness::big>(is);
-					int32 offset = ::read<int32, endianness::big>(is);
-					storage[z] = match_offset{ match, offset };
-				}
-				span<match_offset, uint32> pairs{ storage, n_pairs };
-				return handler(
-					lookup_switch{ _default, pairs }
-				);
+				return handler(lookup_switch::reader{ is });
 			}
 			case 172: return handler(i_return{});
 			case 173: return handler(l_return{});

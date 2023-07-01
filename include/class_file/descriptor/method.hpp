@@ -12,13 +12,13 @@ namespace class_file::method_descriptor {
 		typename Handler,
 		typename ErrorHandler
 	>
-	void constexpr read_return_descriptor(
+	auto constexpr read_return_descriptor(
 		IS&& is,
 		Handler&& handler,
 		ErrorHandler&& error_handler
-	) {
+	) -> decltype(handler(class_file::object{})) {
 		utf8::unit first_char = read<utf8::unit>(is);
-		read_possibly_void_descriptor(
+		return read_possibly_void_descriptor(
 			first_char,
 			forward<IS>(is),
 			forward<Handler>(handler),
@@ -121,7 +121,7 @@ namespace class_file::method_descriptor {
 			uint8 count = 0;
 			bool error_happened = false;
 			try_read_parameter_types_and_get_return_type_reader(
-				[&](auto){ ++count; },
+				[&]<typename...>(auto...){ ++count; },
 				[&](auto error) {
 					error_happened = true; error_handler(error);
 				}

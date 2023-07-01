@@ -55,7 +55,7 @@ namespace class_file::attribute::code {
 
 		auto read_as_span() const
 		requires (Stage == stage::code && contiguous_iterator<IS>) {
-			IS i = is_;
+			remove_reference<IS> i = is_;
 			uint32 length = ::read<uint32, endianness::big>(i);
 			return span{ i, length };
 		}
@@ -76,8 +76,8 @@ namespace class_file::attribute::code {
 		}
 
 		uint16 read_count() const
-		requires (Stage == stage::exception_table && contiguous_range<IS>) {
-			IS i = is_;
+		requires (Stage == stage::exception_table && contiguous_iterator<IS>) {
+			remove_reference<IS> i = is_;
 			uint16 count = ::read<uint16, endianness::big>(i);
 			return count;
 		}
@@ -85,9 +85,8 @@ namespace class_file::attribute::code {
 		template<typename Handler>
 		reader<IS, stage::attributes>
 		read_and_get_attributes_reader(Handler&& handler)
-		requires (Stage == stage::exception_table && contiguous_range<IS>) {
+		requires (Stage == stage::exception_table) {
 			uint16 count = ::read<uint16, endianness::big>(is_);
-			IS end = is_ + sizeof(uint16) * count * 4;
 
 			while(count > 0) {
 				uint16 start_pc = ::read<uint16, endianness::big>(is_);
@@ -104,14 +103,24 @@ namespace class_file::attribute::code {
 				});
 
 				switch (action) {
-					case loop_action::next: break;
-					case loop_action::stop: return { end };
+					case loop_action::next: {
+						--count;
+						continue;
+					}
+					case loop_action::stop: {
+						while(count > 0) {
+							::read<uint16, endianness::big>(is_);
+							::read<uint16, endianness::big>(is_);
+							::read<uint16, endianness::big>(is_);
+							::read<uint16, endianness::big>(is_);
+							--count;
+						}
+						break;
+					};
 				}
-
-				--count;
 			}
 
-			return { end };
+			return { forward<IS>(is_) };
 		}
 
 		template<typename Mapper, typename Handler>
@@ -123,7 +132,7 @@ namespace class_file::attribute::code {
 			while(count > 0) {
 				--count;
 				is_ =
-					attribute::reader{ forward<IS>(is_) }
+					attribute::reader<IS>{ forward<IS>(is_) }
 					.read_and_get_advanced_iterator(
 						forward<Mapper>(mapper),
 						handler

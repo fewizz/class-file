@@ -297,21 +297,59 @@ namespace class_file::attribute::code::instruction {
 		int32 _default;
 		int32 low;
 		int32 high;
-		uint32 offsets_count;
+
+		uint32 offsets_count() const {
+			return high - low + 1;
+		}
 
 		struct offset {
 			int32 value;
 			operator int32() const { return value; }
 		};
 
+		enum class stage {
+			align,
+			range,
+			offsets
+		};
+
+		template<
+			basic_input_stream<uint8> IS,
+			stage Stage = stage::align
+		>
+		struct reader;
+
+		template<basic_input_stream<uint8> IS>
+		reader(IS&&) -> reader<IS>;
+
 	};
 
 	struct lookup_switch {
 		static constexpr uint8 code = 171;
 		int32 _default;
-		uint32 pairs_count;
-		struct match_offset { int32 match; int32 offset; };
-		//span<match_offset, uint32> pairs;
+		int32 pairs_count;
+
+		struct match_and_offset { int32 match; int32 offset; };
+
+		uint32 matches_and_offsets_count() const {
+			return pairs_count;
+		}
+
+		enum class stage {
+			align,
+			range,
+			pairs
+		};
+
+		template<
+			basic_input_stream<uint8> IS,
+			stage Stage = stage::align
+		>
+		struct reader;
+
+		template<basic_input_stream<uint8> IS>
+		reader(IS&&) -> reader<IS>;
+
 	};
 
 	struct i_return { static constexpr uint8 code = 172; };

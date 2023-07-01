@@ -64,9 +64,9 @@ namespace class_file::method {
 				--count;
 				is_ = attribute::reader{ forward<IS>(is_) }
 					.read_and_get_advanced_iterator(
-					forward<Mapper>(mapper),
-					handler
-				);
+						forward<Mapper>(mapper),
+						handler
+					);
 			}
 			return forward<IS>(is_);
 		}
