@@ -11,7 +11,7 @@ namespace class_file {
 	struct base {
 		static constexpr utf8::unit term = Term;
 
-		static constexpr auto utf8_string() {
+		constexpr auto utf8_string() const {
 			return span<const utf8::unit>{ &term, 1 };
 		}
 	};
@@ -30,6 +30,10 @@ namespace class_file {
 	struct object : span<const utf8::unit> {
 		using span<const utf8::unit>::span;
 		constexpr object(span<const utf8::unit> str) : span{ str } {}
+
+		constexpr auto utf8_string() const {
+			return *this;
+		}
 	};
 
 	struct array : object {

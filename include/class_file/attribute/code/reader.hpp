@@ -1,7 +1,6 @@
 #pragma once
 
 #include "./reader_writer_stages.hpp"
-#include "./instruction.hpp"
 #include "./read_instruction.hpp"
 #include "./exception_handler.hpp"
 #include "../../attribute/type.hpp"

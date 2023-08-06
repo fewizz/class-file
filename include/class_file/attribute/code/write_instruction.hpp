@@ -11,7 +11,7 @@ namespace class_file::attribute::code::instruction {
 
 	template<basic_output_stream<uint8> OS, typename Instruction>
 	void write(
-		OS&& os, Instruction instruction, basic_iterator auto begin
+		OS&& os, Instruction instruction
 	) {
 		::write<uint8>(os, Instruction::code);
 
@@ -120,29 +120,6 @@ namespace class_file::attribute::code::instruction {
 		}
 		else if constexpr(same_as<Instruction, return_sr>) {
 			::write<int8>(instruction.index, os);
-		}
-		// table_switch and lookup_switch are below
-		else if constexpr(same_as<Instruction, table_switch>) {
-			while((os - begin) % 4 != 0) {
-				++os;
-			}
-			::write<int32, endianness::big>(instruction._default, os);
-			::write<int32, endianness::big>(instruction.low, os);
-			::write<int32, endianness::big>(instruction.high, os);
-			for(int32 offset : instruction.offsets) {
-				::write<int32, endianness::big>(offset, os);
-			}
-		}
-		else if constexpr(same_as<Instruction, lookup_switch>) {
-			while((os - begin) % 4 != 0) {
-				++os;
-			}
-			::write<int32, endianness::big>(instruction._default, os);
-			::write<int32, endianness::big>(instruction.pairs.size(), os);
-			for(match_offset mo : instruction.match_offsets) {
-				::write<int32, endianness::big>(mo.match, os);
-				::write<int32, endianness::big>(mo.offset, os);
-			}
 		}
 		else if constexpr(same_as_any<Instruction,
 			i_return, l_return, f_return, d_return, a_return, _return

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../constant.hpp"
-#include "../../descriptor/type.hpp"
 
 #include <span.hpp>
 
@@ -40,15 +39,15 @@ namespace class_file::attribute::code::instruction {
 
 	struct ldc {
 		static constexpr uint8 code = 18;
-		constant::index index;
+		constant::index constant_index;
 	};
 	struct ldc_w {
 		static constexpr uint8 code = 19;
-		constant::index index;
+		constant::index constant_index;
 	};
 	struct ldc_2_w {
 		static constexpr uint8 code = 20;
-		constant::index index;
+		constant::index constant_index;
 	};
 
 	struct i_load {
@@ -322,6 +321,15 @@ namespace class_file::attribute::code::instruction {
 		template<basic_input_stream<uint8> IS>
 		reader(IS&&) -> reader<IS>;
 
+		template<
+			basic_output_stream<uint8> IS,
+			stage Stage = stage::align
+		>
+		struct writer;
+
+		template<basic_output_stream<uint8> IS>
+		writer(IS&&) -> writer<IS>;
+
 	};
 
 	struct lookup_switch {
@@ -350,6 +358,15 @@ namespace class_file::attribute::code::instruction {
 		template<basic_input_stream<uint8> IS>
 		reader(IS&&) -> reader<IS>;
 
+		template<
+			basic_output_stream<uint8> OS,
+			stage Stage = stage::align
+		>
+		struct writer;
+
+		template<basic_input_stream<uint8> OS>
+		writer(OS&&) -> writer<OS>;
+
 	};
 
 	struct i_return { static constexpr uint8 code = 172; };
@@ -357,49 +374,52 @@ namespace class_file::attribute::code::instruction {
 	struct f_return { static constexpr uint8 code = 174; };
 	struct d_return { static constexpr uint8 code = 175; };
 	struct a_return { static constexpr uint8 code = 176; };
-	struct _return { static constexpr uint8 code = 177; };
+	struct _return  { static constexpr uint8 code = 177; };
 
 	struct get_static {
 		static constexpr uint8 code = 178;
-		constant::field_ref_index index;
+		constant::field_ref_index field_ref_constant_index;
 	};
 	struct put_static {
 		static constexpr uint8 code = 179;
-		constant::field_ref_index index;
+		constant::field_ref_index field_ref_constant_index;
 	};
 	struct get_field {
 		static constexpr uint8 code = 180;
-		constant::field_ref_index index;
+		constant::field_ref_index field_ref_constant_index;
 	};
 	struct put_field {
 		static constexpr uint8 code = 181;
-		constant::field_ref_index index;
+		constant::field_ref_index field_ref_constant_index;
 	};
 	struct invoke_virtual {
 		static constexpr uint8 code = 182;
-		constant::method_ref_index index;
+		constant::method_ref_index method_ref_constant_index;
 	};
 	struct invoke_special {
 		static constexpr uint8 code = 183;
-		constant::method_or_interface_method_ref_index index;
+		constant::method_or_interface_method_ref_index
+			method_or_interface_method_ref_constant_index;
 	};
 	struct invoke_static {
 		static constexpr uint8 code = 184;
-		constant::method_or_interface_method_ref_index index;
+		constant::method_or_interface_method_ref_index
+			method_or_interface_method_ref_constant_index;
 	};
 	struct invoke_interface {
 		static constexpr uint8 code = 185;
-		constant::interface_method_ref_index index;
+		constant::interface_method_ref_index
+			interface_method_ref_constant_index;
 		uint8 count;
 	};
 	struct invoke_dynamic {
 		static constexpr uint8 code = 186;
-		constant::invoke_dynamic_index index;
+		constant::invoke_dynamic_index invoke_dynamic_constant_index;
 	};
 
 	struct _new {
 		static constexpr uint8 code = 187;
-		constant::class_index index;
+		constant::class_index class_constant_index;
 	};
 	enum class new_array_type : uint8 {
 		_bool = 4, _char  = 5, _float = 6, _double = 7,
@@ -411,7 +431,7 @@ namespace class_file::attribute::code::instruction {
 	};
 	struct a_new_array {
 		static constexpr uint8 code = 189;
-		constant::class_index index;
+		constant::class_index class_constant_index;
 	};
 	struct array_length { static constexpr uint8 code = 190; };
 
@@ -419,11 +439,11 @@ namespace class_file::attribute::code::instruction {
 
 	struct check_cast {
 		static constexpr uint8 code = 192;
-		constant::class_index index;
+		constant::class_index class_constant_index;
 	};
 	struct instance_of {
 		static constexpr uint8 code = 193;
-		constant::class_index index;
+		constant::class_index class_constant_index;
 	};
 	struct monitor_enter { static constexpr uint8 code = 194; };
 	struct monitor_exit { static constexpr uint8 code = 195; };
@@ -443,7 +463,7 @@ namespace class_file::attribute::code::instruction {
 
 	struct multi_new_array {
 		static constexpr uint8 code = 197;
-		uint16 index;
+		constant::class_index class_index;
 		uint8 dimensions;
 	};
 

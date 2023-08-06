@@ -46,7 +46,7 @@ namespace class_file::attribute::code {
 			uint32 length, Handler&& handler
 		) const
 		requires (Stage == stage::code) {
-			Iterator i = iterator_;
+			/*Iterator i = iterator_;
 			::write<uint32, endianness::big>(length, i);
 			Iterator begin = i;
 
@@ -54,7 +54,7 @@ namespace class_file::attribute::code {
 				instruction::write(i, instruction, begin);
 			});
 
-			return { i };
+			return { i };*/ // TODO
 		}
 
 		template<typename Handler>

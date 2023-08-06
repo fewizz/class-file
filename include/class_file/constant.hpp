@@ -90,6 +90,14 @@ namespace class_file::constant {
 		using index::index;
 	};
 
+	class method_type_index : public index {
+		using index::index;
+	};
+
+	class dynamic_index : public index {
+		using index::index;
+	};
+
 	class invoke_dynamic_index : public index {
 		using index::index;
 	};
@@ -100,6 +108,14 @@ namespace class_file::constant {
 
 	class descriptor_index : public utf8_index {
 		using utf8_index::utf8_index;
+	};
+
+	class module_index : public index {
+		using index::index;
+	};
+
+	class package_index : public index {
+		using index::index;
 	};
 
 	struct unknown {
@@ -114,60 +130,82 @@ namespace class_file::constant {
 		using base_type = span<const ::utf8::unit, uint16>;
 	public:
 		using base_type::base_type;
+		using index_type = utf8_index;
+	};
+
+	struct name : utf8 {
+		using utf8::utf8;
+		using index_type = name_index;
+		explicit name(utf8 base) : utf8{ base } {}
+	};
+
+	struct descriptor : utf8 {
+		using utf8::utf8;
+		using index_type = descriptor_index;
 	};
 
 	struct _int {
 		static constexpr uint8 tag = 3;
 		::int32 value;
+		using index_type = int_index;
 	};
 
 	struct _float {
 		static constexpr uint8 tag = 4;
 		float value;
+		using index_type = float_index;
 	};
 
 	struct _long {
 		static constexpr uint8 tag = 5;
 		::int64 value;
+		using index_type = long_index;
 	};
 
 	struct _double {
 		static constexpr uint8 tag = 6;
 		double value;
+		using index_type = double_index;
 	};
 
 	struct _class {
 		static constexpr uint8 tag = 7;
-		name_index name_index;
+		name_index name_constant_index;
+		using index_type = class_index;
 	};
 
 	struct string {
 		static constexpr uint8 tag = 8;
-		utf8_index string_index;
+		utf8_index utf8_constant_index;
+		using index_type = class string_index;
 	};
 
 	struct field_ref {
 		static constexpr uint8 tag = 9;
-		class_index class_index;
-		name_and_type_index name_and_type_index;
+		class_index class_constant_index;
+		name_and_type_index name_and_type_constant_index;
+		using index_type = field_ref_index;
 	};
 
 	struct method_ref {
 		static constexpr uint8 tag = 10;
-		class_index class_index;
-		name_and_type_index name_and_type_index;
+		class_index class_constant_index;
+		name_and_type_index name_and_type_constant_index;
+		using index_type = method_ref_index;
 	};
 
 	struct interface_method_ref {
 		static constexpr uint8 tag = 11;
-		class_index class_index;
-		name_and_type_index name_and_type_index;
+		class_index class_constant_index;
+		name_and_type_index name_and_type_constant_index;
+		using index_type = interface_method_ref_index;
 	};
 
 	struct name_and_type {
 		static constexpr uint8 tag = 12;
-		name_index name_index;
-		descriptor_index descriptor_index;
+		name_index name_constant_index;
+		descriptor_index descriptor_constant_index;
+		using index_type = name_and_type_index;
 	};
 
 	struct method_handle {
@@ -183,34 +221,40 @@ namespace class_file::constant {
 			new_invoke_special,
 			invoke_interface
 		} kind;
-		constant::index reference_index;
+		constant::index reference_constant_index;
+		using index_type = method_handle_index;
 	};
 
 	struct method_type {
 		static constexpr uint8 tag = 16;
-		descriptor_index descriptor_index;
+		descriptor_index descriptor_constant_index;
+		using index_type = method_type_index;
 	};
 
 	struct dynamic {
 		static constexpr uint8 tag = 17;
 		uint16 bootstrap_method_attr_index;
-		name_and_type_index name_and_type_index;
+		name_and_type_index name_and_type_constant_index;
+		using index_type = dynamic_index;
 	};
 
 	struct invoke_dynamic {
 		static constexpr uint8 tag = 18;
 		uint16 bootstrap_method_attr_index;
-		name_and_type_index name_and_type_index;
+		name_and_type_index name_and_type_constant_index;
+		using index_type = invoke_dynamic_index;
 	};
 
 	struct module {
 		static constexpr uint8 tag = 19;
-		name_index name_index;
+		name_index name_constant_index;
+		using index_type = module_index;
 	};
 
 	struct package {
 		static constexpr uint8 tag = 20;
-		name_index name_index;
+		name_index name_constant_index;
+		using index_type = package_index;
 	};
 
 }
