@@ -9,11 +9,11 @@
 
 namespace class_file::attribute::code::instruction {
 
-	template<basic_output_stream<uint8> OS, typename Instruction>
+	template<typename Instruction, basic_output_stream<uint8> OS>
 	void write(
-		OS&& os, Instruction instruction
+		Instruction instruction, OS&& os
 	) {
-		::write<uint8>(os, Instruction::code);
+		::write<uint8>(Instruction::code, os);
 
 		if constexpr(same_as_any<Instruction,
 			nop, a_const_null, i_const_m1, i_const_0, i_const_1, i_const_2,
@@ -29,7 +29,7 @@ namespace class_file::attribute::code::instruction {
 			::write<int16, endianness::big>(instruction.value, os);
 		}
 		else if constexpr(same_as<Instruction, ldc>) {
-			::write<uint8>(instruction.index, os);
+			::write<uint8, endianness::big>(instruction.index, os);
 		}
 		else if constexpr(same_as<Instruction, ldc_w>) {
 			::write<uint16, endianness::big>(instruction.index, os);
@@ -128,29 +128,57 @@ namespace class_file::attribute::code::instruction {
 		}
 		else if constexpr(same_as_any<Instruction,
 			get_static, put_static,
-			get_field, put_field,
-			invoke_virtual, invoke_special, invoke_static
+			get_field, put_field
 		>) {
-			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint16, endianness::big>(
+				instruction.field_ref_constant_index,
+				os
+			);
+		}
+		else if constexpr(same_as<Instruction, invoke_virtual>) {
+			::write<uint16, endianness::big>(
+				instruction.method_ref_constant_index,
+				os
+			);
+		}
+		else if constexpr(same_as_any<Instruction,
+			invoke_special, invoke_static>
+		) {
+			::write<uint16, endianness::big>(
+				instruction.method_or_interface_method_ref_constant_index,
+				os
+			);
 		}
 		else if constexpr(same_as<Instruction, invoke_interface>) {
-			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint16, endianness::big>(
+				instruction.interface_method_ref_constant_index,
+				os
+			);
 			::write<uint8>(instruction.count, os);
 			::write<uint8>(0, os);
 		}
 		else if constexpr(same_as<Instruction, invoke_dynamic>) {
-			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint16, endianness::big>(
+				instruction.invoke_dynamic_constant_index,
+				os
+			);
 			::write<uint8>(0, os);
 			::write<uint8>(0, os);
 		}
 		else if constexpr(same_as<Instruction, _new>) {
-			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint16, endianness::big>(
+				instruction.class_constant_index,
+				os
+			);
 		}
-		else if constexpr(same_as<Instruction, new_array_type>) {
-			::write<uint8>(instruction, os);
+		else if constexpr(same_as<Instruction, new_array>) {
+			::write<uint8>(instruction.new_array_type, os);
 		}
 		else if constexpr(same_as<Instruction, a_new_array>) {
-			::write<uint16, endianness::big>(instruction.index, os);
+			::write<uint16, endianness::big>(
+				instruction.class_constant_index,
+				os
+			);
 		}
 		else if constexpr(same_as_any<Instruction, array_length, a_throw>) {
 			// do nothing
@@ -185,7 +213,7 @@ namespace class_file::attribute::code::instruction {
 			::write<int32, endianness::big>(instruction.banch, os);
 		}
 		else {
-			Instruction::UNKNOWN;
+			[]<bool b = false>{ static_assert(b); }();
 		}
 	}
 

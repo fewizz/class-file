@@ -44,8 +44,9 @@ namespace class_file {
 
 		access_flags() {}
 
-		access_flags(access_flag flag) {
-			((access_flag&) *this) = flag; // ugh
+		template<same_as<access_flag>... Types>
+		access_flags(Types... flags) {
+			((access_flag&) *this) = (access_flag)((uint16) flags | ... );
 		}
 
 		operator uint16() const {
