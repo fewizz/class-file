@@ -166,4 +166,7 @@ namespace class_file::constant {
 
 	};
 
+	template<basic_input_stream<uint8> IS>
+	reader(IS&&) -> reader<IS>;
+
 }

@@ -45,6 +45,15 @@ namespace class_file {
 			return { { major, minor }, { forward<IS>(is_) } };
 		}
 
+		
+		reader<IS, stage::constant_pool>
+		skip_and_get_constant_pool_reader()
+		requires (Stage == stage::version) {
+			::read<uint16, endianness::big>(is_);
+			::read<uint16, endianness::big>(is_);
+			return { forward<IS>(is_) };
+		}
+
 		template<typename Handler>
 		reader<IS, stage::access_flags>
 		read_and_get_access_flags_reader(Handler&& handler)

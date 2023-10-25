@@ -2,17 +2,13 @@
 
 #include "./count.hpp"
 #include "./method_reader.hpp"
+#include "./reader_writer_stages.hpp"
 #include "../type.hpp"
 
 #include <read.hpp>
 #include <tuple.hpp>
 
 namespace class_file::attribute::bootstrap_methods {
-
-	enum class stage {
-		count,
-		methods
-	};
 
 	template<
 		basic_input_stream<uint8> IS,

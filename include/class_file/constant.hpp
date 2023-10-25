@@ -18,10 +18,12 @@ namespace class_file::constant {
 
 	class utf8_index : public index {
 		using index::index;
+		using constant_type = struct utf8;
 	};
 
 	class int_index : public index {
 		using index::index;
+		using constant_type = struct _int;
 	};
 
 	class float_index : public index {
@@ -38,6 +40,8 @@ namespace class_file::constant {
 
 	class class_index : public index {
 		using index::index;
+	public:
+		using constant_type = struct _class;
 	};
 
 	class string_index : public index {
@@ -50,6 +54,7 @@ namespace class_file::constant {
 
 	class method_ref_index : public index {
 		using index::index;
+		using constant_type = struct method_ref;
 	};
 
 	class interface_method_ref_index : public index {
@@ -84,6 +89,8 @@ namespace class_file::constant {
 
 	class name_and_type_index : public index {
 		using index::index;
+	public:
+		using constant_type = struct name_and_type;
 	};
 
 	class method_handle_index : public index {
@@ -104,10 +111,14 @@ namespace class_file::constant {
 
 	class name_index : public utf8_index {
 		using utf8_index::utf8_index;
+	public:
+		using constant_type = struct name;
 	};
 
 	class descriptor_index : public utf8_index {
 		using utf8_index::utf8_index;
+	public:
+		using constant_type = struct descriptor;
 	};
 
 	class module_index : public index {

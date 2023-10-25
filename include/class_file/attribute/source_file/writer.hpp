@@ -10,14 +10,14 @@
 namespace class_file::source_file {
 
 	template<basic_iterator Iterator>
-	class reader {
+	class writer {
 		const Iterator iterator_;
 	public:
 
 		static constexpr attribute::type attribute_type
 			= attribute::type::source_file;
 
-		reader(Iterator iterator) : iterator_{ iterator } {}
+		writer(Iterator iterator) : iterator_{ iterator } {}
 
 		Iterator write_index_and_get_advanced_iterator(
 			constant::utf8_index ci

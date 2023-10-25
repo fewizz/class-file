@@ -11,105 +11,123 @@
 
 namespace class_file::constant {
 
-	template<basic_iterator Iterator>
+	template<basic_output_stream<uint8> OS>
 	class writer {
-		const Iterator iterator_;
+		const OS os_;
 	public:
 
-		writer(Iterator it) : iterator_{ it } {}
+		writer(OS&& os) : os_{ forward<OS>(os) } {}
 		writer(      writer&&) = delete;
 		writer(const writer& ) = delete;
 
 		void operator () (utf8 str) {
-			write<uint16, endianness::big>(iterator_, str.size());
-			for(int i = 0; i < str.size(); ++i) {
-				write(str[i], iterator_);
-			}
+			::write<uint8>(os_, (uint8) utf8::tag);
+			::write<uint16, endianness::big>(os_, str.size());
+			str.copy_to(os_);
 		}
 
 		void operator () (_int v) {
-			write<int32, endianness::big>(iterator_, v.value);
+			::write<uint8>(os_, (uint8) _int::tag);
+			::write<int32, endianness::big>(os_, v.value);
 		}
 
 		void operator () (_float v) {
-			write<float, endianness::big>(iterator_, v.value);
+			::write<uint8>(os_, (uint8) _float::tag);
+			::write<float, endianness::big>(os_, v.value);
 		}
 
 		void operator () (_long v) {
-			write<int64, endianness::big>(iterator_, v.value);
+			::write<uint8>(os_, (uint8) _long::tag);
+			::write<int64, endianness::big>(os_, v.value);
 		}
 
 		void operator () (_double v) {
-			write<double, endianness::big>(iterator_, v.value);
+			::write<uint8>(os_, (uint8) _double::tag);
+			::write<double, endianness::big>(os_, v.value);
 		}
 
 		void operator () (_class c) {
-			write<uint16, endianness::big>(iterator_, c.name_index);
+			::write<uint8>(os_, (uint8) _class::tag);
+			::write<uint16, endianness::big>(os_, c.name_constant_index);
 		}
 
 		void operator () (string s) {
-			write<uint16, endianness::big>(iterator_, s.string_index);
+			::write<uint8>(os_, (uint8) string::tag);
+			::write<uint16, endianness::big>(os_, s.utf8_constant_index);
 		}
 
 		void operator () (field_ref fr) {
-			write<uint16, endianness::big>(iterator_, fr.class_index);
-			write<uint16, endianness::big>(iterator_, fr.name_and_type_index);
+			::write<uint8>(os_, (uint8) field_ref::tag);
+			::write<uint16, endianness::big>(os_, fr.class_constant_index);
+			::write<uint16, endianness::big>(os_, fr.name_and_type_constant_index);
 		}
 
 		void operator () (method_ref mr) {
-			write<uint16, endianness::big>(iterator_, mr.class_index);
-			write<uint16, endianness::big>(iterator_, mr.name_and_type_index);
+			::write<uint8>(os_, (uint8) method_ref::tag);
+			::write<uint16, endianness::big>(os_, mr.class_constant_index);
+			::write<uint16, endianness::big>(os_, mr.name_and_type_constant_index);
 		}
 
 		void operator () (interface_method_ref mr) {
-			write<uint16, endianness::big>(iterator_, mr.class_index);
-			write<uint16, endianness::big>(iterator_, mr.name_and_type_index);
+			::write<uint8>(os_, (uint8) interface_method_ref::tag);
+			::write<uint16, endianness::big>(os_, mr.class_constant_index);
+			::write<uint16, endianness::big>(os_, mr.name_and_type_constant_index);
 		}
 
 		void operator () (name_and_type mr) {
-			write<uint16, endianness::big>(iterator_, mr.name_index);
-			write<uint16, endianness::big>(iterator_, mr.descriptor_index);
+			::write<uint8>(os_, (uint8) name_and_type::tag);
+			::write<uint16, endianness::big>(os_, mr.name_constant_index);
+			::write<uint16, endianness::big>(os_, mr.descriptor_constant_index);
 		}
 
 		void operator () (method_handle mh) {
-			write<uint8>(iterator_, mh.kind);
-			write<uint16, endianness::big>(iterator_, mh.reference_index);
+			::write<uint8>(os_, (uint8) method_handle::tag);
+			::write<uint8>(os_, (uint8) mh.kind);
+			::write<uint16, endianness::big>(os_, mh.reference_constant_index);
 		}
 
 		void operator () (method_type mt) {
-			write<uint16, endianness::big>(iterator_, mt.descriptor_index);
+			::write<uint8>(os_, (uint8) method_type::tag);
+			::write<uint16, endianness::big>(os_, mt.descriptor_constant_index);
 		}
 
 		void operator () (dynamic dyn) {
-			write<uint16, endianness::big>(
-				iterator_,
+			::write<uint8>(os_, (uint8) dynamic::tag);
+			::write<uint16, endianness::big>(
+				os_,
 				dyn.bootstrap_method_attr_index
 			);
-			write<uint16, endianness::big>(
-				iterator_,
-				dyn.name_and_type_index
+			::write<uint16, endianness::big>(
+				os_,
+				dyn.name_and_type_constant_index
 			);
 		}
 
 		void operator () (invoke_dynamic id) {
-			write<uint16, endianness::big>(
-				iterator_,
+			::write<uint8>(os_, (uint8) invoke_dynamic::tag);
+			::write<uint16, endianness::big>(
+				os_,
 				id.bootstrap_method_attr_index
 			);
-			write<uint16, endianness::big>(
-				iterator_,
-				id.name_and_type_index
+			::write<uint16, endianness::big>(
+				os_,
+				id.name_and_type_constant_index
 			);
 		}
 
 		void operator () (module m) {
-			write<uint16, endianness::big>(iterator_, m.name_index);
+			::write<uint8>(os_, (uint8) module::tag);
+			::write<uint16, endianness::big>(os_, m.name_constant_index);
 		}
 
 		void operator () (package p) {
-			write<uint16, endianness::big>(iterator_, p.name_index);
+			::write<uint8>(os_, (uint8) package::tag);
+			::write<uint16, endianness::big>(os_, p.name_constant_index);
 		}
 
 	};
+
+	template<basic_output_stream<uint8> OS>
+	writer(OS&& os) -> writer<OS&&>;
 
 }
