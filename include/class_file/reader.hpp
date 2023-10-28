@@ -96,6 +96,14 @@ namespace class_file {
 			return { flags, { forward<IS>(is_) } };
 		}
 
+		
+		reader<IS, stage::this_class>
+		skip_and_get_this_class_reader()
+		requires (Stage == stage::access_flags) {
+			::read<access_flag, endianness::big>(is_);
+			return { forward<IS>(is_) };
+		}
+
 		tuple<
 			constant::class_index,
 			reader<IS, stage::super_class>
@@ -108,6 +116,13 @@ namespace class_file {
 			return { this_class_index, { forward<IS>(is_) } };
 		}
 
+		reader<IS, stage::super_class>
+		skip_and_get_super_class_reader()
+		requires (Stage == stage::this_class) {
+			::read<uint16, endianness::big>(is_);
+			return { forward<IS>(is_) };
+		}
+
 		tuple<
 			constant::class_index,
 			reader<IS, stage::interfaces>
@@ -118,6 +133,13 @@ namespace class_file {
 				::read<uint16, endianness::big>(is_)
 			};
 			return { super_class_index, { forward<IS>(is_) } };
+		}
+
+		reader<IS, stage::interfaces>
+		skip_and_get_interfaces_reader()
+		requires (Stage == stage::super_class) {
+			::read<uint16, endianness::big>(is_);
+			return { forward<IS>(is_) };
 		}
 
 		uint16 get_count() const
@@ -138,6 +160,12 @@ namespace class_file {
 				handler(index);
 			}
 			return { forward<IS>(is_) };
+		}
+
+		reader<IS, stage::fields>
+		skip_and_get_fields_reader()
+		requires (Stage == stage::interfaces) {
+			return read_and_get_fields_reader([](auto){});
 		}
 
 		uint16 get_count () const

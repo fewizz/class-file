@@ -31,6 +31,13 @@ namespace class_file::method {
 			return { flags, { forward<IS>(is_) } };
 		}
 
+		reader<IS, stage::name_index>
+		skip_access_flags_and_get_name_index_reader()
+		requires (Stage == stage::access_flags) {
+			::read<access_flag, endianness::big>(is_);
+			return { forward<IS>(is_) };
+		}
+
 		tuple<
 			constant::name_index,
 			reader<IS, stage::descriptor_index>
@@ -41,6 +48,13 @@ namespace class_file::method {
 				::read<uint16, endianness::big>(is_)
 			};
 			return { name_index, { forward<IS>(is_) } };
+		}
+
+		reader<IS, stage::descriptor_index>
+		skip_and_get_descriptor_index_reader()
+		requires (Stage == stage::name_index) {
+			::read<uint16, endianness::big>(is_);
+			return { forward<IS>(is_) };
 		}
 
 		tuple<
@@ -68,6 +82,17 @@ namespace class_file::method {
 						forward<Mapper>(mapper),
 						handler
 					);
+			}
+			return forward<IS>(is_);
+		}
+
+		IS skip_and_get_advanced_iterator() {
+			uint16 count = ::read<uint16, endianness::big>(is_);
+			while(count > 0) {
+				--count;
+				::read<uint16, endianness::big>(is_); // name index
+				auto length = ::read<uint32, endianness::big>(is_);
+				is_ += length;
 			}
 			return forward<IS>(is_);
 		}
