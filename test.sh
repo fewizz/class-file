@@ -32,5 +32,5 @@ if [ ! -z $1 ]; then
 	exit
 fi
 
-test descriptor/read_type
-test descriptor/method_reader
+test descriptor/field
+test descriptor/method
